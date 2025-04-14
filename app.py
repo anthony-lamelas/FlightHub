@@ -1,6 +1,7 @@
 # Import Flask library
 from flask import Flask
 import pymsql.cursor
+import mysql.connector
 
 # Initialize app from Flask
 app = Flask(__name__)
@@ -33,3 +34,13 @@ def register():
 def login():
     # similar: detect user type and check correct table
     pass
+
+def get_db_connection():
+    conn = mysql.connector.connect(
+        host='localhost',
+        port=8889,
+        user='root',
+        password='root',
+        database='air_ticket_db'  # use your actual DB name
+    )
+    return conn
