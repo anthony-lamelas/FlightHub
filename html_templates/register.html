@@ -12,9 +12,116 @@
     <title>Register Page</title>
   </head>
   <body>
-    <!-- everything inside the body tag shows up to the user unless modified to not be visible with css -->
+    <script>
+      function toggleForm() {
+        const role = document.querySelector('input[name="role"]:checked').value;
+        document.getElementById("customer-form").style.display =
+          role === "Customer" ? "block" : "none";
+        document.getElementById("staff-form").style.display =
+          role === "Staff" ? "block" : "none";
+      }
+
+      window.onload = toggleForm; // show correct form on page load
+    </script>
 
     <!-- ONLY 1 H1 PER PAGE -->
-    <h1>Hello World!</h1>
+    <h1>Register</h1>
+
+    <form method="POST" action="/register">
+      <!-- User chooses role -->
+      <label>
+        <input
+          type="radio"
+          name="role"
+          value="customer"
+          checked
+          onchange="toggleForm()"
+        />
+        Customer
+      </label>
+      <label>
+        <input type="radio" name="role" value="staff" onchange="toggleForm()" />
+        Airline Staff
+      </label>
+
+      <!-- Customer Form -->
+      <div id="customer-form">
+        <h2>Customer Info</h2>
+        <label>First Name:</label>
+        <input type="text" name="first_name" required /><br />
+
+        <label>Last Name:</label>
+        <input type="text" name="last_name" required /><br />
+
+        <label>Building Number:</label>
+        <input type="text" name="building_number" required /><br />
+
+        <label>Street:</label>
+        <input type="text" name="street" required /><br />
+
+        <label>City:</label>
+        <input type="text" name="city" required /><br />
+
+        <label>State:</label>
+        <input type="text" name="state" required /><br />
+
+        <label>Phone Number:</label>
+        <input type="text" name="phone_number" required /><br />
+
+        <label>Passport Number:</label>
+        <input type="text" name="passport_number" required /><br />
+
+        <label>Passport Country:</label>
+        <input type="text" name="passport_country" required /><br />
+
+        <label>Passport Expiration:</label>
+        <input type="date" name="passport_expiration" required /><br />
+
+        <label>Date of Birth:</label>
+        <input type="date" name="date_of_birth" required /><br />
+
+        <label>Email:</label>
+        <input type="email" name="email" required /><br />
+
+        <label>Password:</label>
+        <input type="password" name="password" required /><br />
+      </div>
+
+      <!-- Staff Form -->
+      <div id="staff-form" style="display: none">
+        <h2>Airline Staff Info</h2>
+
+        <label>Username:</label>
+        <input type="text" name="username" required /><br />
+
+        <label>First Name:</label>
+        <input type="text" name="first_name" required /><br />
+
+        <label>Last Name:</label>
+        <input type="text" name="last_name" required /><br />
+
+        <label>Date of Birth:</label>
+        <input type="date" name="date_of_birth" required /><br />
+
+        <label>Airline Name:</label>
+        <input type="text" name="airline_name" required /><br />
+
+        <label>Emails:</label><br />
+        <input type="email" name="email" required /><br />
+        <input type="email" name="email" /><br />
+        <!-- Optional second email -->
+
+        <label>Phone Numbers:</label><br />
+        <input type="text" name="phone_number" required /><br />
+        <input type="text" name="phone_number" /><br />
+        <!-- Optional second phone -->
+
+        <label>Password:</label>
+        <input type="password" name="password" required /><br />
+      </div>
+
+      <br />
+      <button type="submit">Register</button>
+    </form>
   </body>
 </html>
