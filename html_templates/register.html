@@ -16,9 +16,9 @@
       function toggleForm() {
         const role = document.querySelector('input[name="role"]:checked').value;
         document.getElementById("customer-form").style.display =
-          role === "Customer" ? "block" : "none";
+          role === "customer" ? "block" : "none";
         document.getElementById("staff-form").style.display =
-          role === "Staff" ? "block" : "none";
+          role === "staff" ? "block" : "none";
       }
 
       window.onload = toggleForm; // show correct form on page load
@@ -45,7 +45,7 @@
       </label>
 
       <!-- Customer Form -->
-      <div id="customer-form">
+      <div id="customer-form" style="display: none">
         <h2>Customer Info</h2>
         <label>First Name:</label>
         <input type="text" name="first_name" required /><br />

@@ -18,7 +18,7 @@
     <h1>Homepage</h1>
 
     <!-- Flight Search Form (User Input) -->
-    <form method="POST" action="/search">
+    <form method="POST" action="{{ url_for('public_bp.search_flights') }}">
       <label for="source">From:</label>
       <input
         type="text"

@@ -1,46 +1,40 @@
-# Import Flask library
-from flask import Flask
-import pymsql.cursor
+from flask import Flask, render_template
 import mysql.connector
 
-# Initialize app from Flask
-app = Flask(__name__)
+# Import Blueprints from your routes folder
+from routes.public_info import public_bp
+from routes.auth import auth_bp
+from routes.airline_staff import staff_bp
+from routes.customer import customer_bp
 
-# Define route to hello function
-@app.route('/')
-def hello():
-    return 'Hello World'
+# Initialize Flask app and set template folder
+app = Flask(__name__, template_folder='html_templates')
 
-# Run the app on localhost
-# debug = True -> you don't have to restart flask
-# for changes to go through, turn off for production
-if __name__ == '__main__':
-    app.run('', 5000, debug=True)
+# Secret key is required for session handling
+app.secret_key = "supersecretkey"  
 
+# Register Blueprints
+app.register_blueprint(public_bp)
+app.register_blueprint(auth_bp)
+app.register_blueprint(staff_bp)
+app.register_blueprint(customer_bp)
 
-
+# Public homepage
 @app.route('/')
 def home():
-    # search form + results for public users
     return render_template('home.html')
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    # handle user type selection: Customer or Staff
-    # show different registration forms or handle in one form
-    pass
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    # similar: detect user type and check correct table
-    pass
-
+# Shared DB connection function
 def get_db_connection():
     conn = mysql.connector.connect(
         host='localhost',
         port=8889,
         user='root',
         password='root',
-        database='air_ticket_db'  # use your actual DB name
+        database='air_ticket_db'
     )
     return conn
+
+# Run the app
+if __name__ == '__main__':
+    app.run(host='localhost', port=5000, debug=True)

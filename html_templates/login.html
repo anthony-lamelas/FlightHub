@@ -1,20 +1,96 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <!-- this specifies the character set encoding.  -->
-    <!-- without this tag our fonts might not load properly -->
     <meta charset="utf-8" />
-
-    <!-- the viewport tag sets the initial scale and ensures proper responsive behavior -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <!-- the title tag shows up in the browser tab -->
     <title>Login Page</title>
   </head>
   <body>
-    <!-- everything inside the body tag shows up to the user unless modified to not be visible with css -->
+    <h1>Login</h1>
 
-    <!-- ONLY 1 H1 PER PAGE -->
-    <h1>Hello World!</h1>
+    <script>
+      function toggleForm() {
+        const role = document.querySelector('input[name="role"]:checked').value;
+        document.getElementById("customer-login").style.display =
+          role === "customer" ? "block" : "none";
+        document.getElementById("staff-login").style.display =
+          role === "staff" ? "block" : "none";
+      }
+
+      window.onload = toggleForm;
+    </script>
+
+    <form method="POST" action="/login">
+      <!-- Role selection -->
+      <label for="role-customer">
+        <input
+          type="radio"
+          name="role"
+          id="role-customer"
+          value="customer"
+          checked
+          onchange="toggleForm()"
+        />
+        Customer
+      </label>
+      <label for="role-staff">
+        <input
+          type="radio"
+          name="role"
+          id="role-staff"
+          value="staff"
+          onchange="toggleForm()"
+        />
+        Airline Staff
+      </label>
+
+      <br /><br />
+
+      <!-- Customer Login Form -->
+      <div id="customer-login" style="display: block">
+        <label for="customer-email">Email:</label>
+        <input
+          type="text"
+          id="customer-email"
+          name="identifier"
+          required
+        /><br />
+
+        <label for="customer-password">Password:</label>
+        <input
+          type="password"
+          id="customer-password"
+          name="password"
+          required
+        /><br />
+
+        <button type="submit">Login</button>
+      </div>
+
+      <!-- Staff Login Form -->
+      <div id="staff-login" style="display: none">
+        <label for="staff-username">Username:</label>
+        <input
+          type="text"
+          id="staff-username"
+          name="identifier"
+          required
+        /><br />
+
+        <label for="staff-password">Password:</label>
+        <input
+          type="password"
+          id="staff-password"
+          name="password"
+          required
+        /><br />
+
+        <button type="submit">Login</button>
+      </div>
+    </form>
+
+    {% if error %}
+    <p style="color: red; font-weight: bold; margin-top: 1em">{{ error }}</p>
+    {% endif %}
   </body>
 </html>

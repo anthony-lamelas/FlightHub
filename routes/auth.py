@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, redirect, session
 import hashlib 
 from app import get_db_connection
 
@@ -8,8 +8,6 @@ auth_bp = Blueprint("auth", __name__)
 def register():
     if request.method == "POST":  # checks if form has been submitted
         role = request.form.get("role")
-           
-
 
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -59,17 +57,62 @@ def register():
             password = hashlib.md5(request.form.get("password").encode()).hexdigest()
 
             cursor.execute("""
-                INSERT INTO AirlineStaff (
+                INSERT INTO Airline_Staff (
                 username, password, first_name, last_name, date_of_birth, airline_name)
                 VALUES (%s, %s, %s, %s, %s, %s)
                 """, (username, password, first_name, last_name, date_of_birth, airline_name))
             
             emails = request.form.getlist("email")  # supports multiple if form uses name="email"
             for email in emails:
-                cursor.execute("INSERT INTO StaffEmail (username, email) VALUES (%s, %s)", (username, email))
+                cursor.execute("INSERT INTO Staff_Email (username, email) VALUES (%s, %s)", (username, email))
             
             phones = request.form.getlist("phone_number")
             for phone in phones:
-                cursor.execute("INSERT INTO StaffPhoneNumber (username, phone_number) VALUES (%s, %s)", (username, phone))
+                cursor.execute("INSERT INTO Staff_Phone_Number (username, phone_number) VALUES (%s, %s)", (username, phone))
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return redirect("/login")
+    
+    return render_template("register.html")
 
+
+
+@auth_bp.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        role = request.form.get("role")
+        identifier = request.form.get("identifier")  # email for customer, username for staff
+        password = request.form.get("password")
+        password = hashlib.md5(password.encode()).hexdigest()
+
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        if role == "customer" or role == "Customer":
+            query = "SELECT * FROM Customer WHERE email = %s AND password = %s"
+        elif role == "staff" or role == "Staff":
+            query = "SELECT * FROM Airline_Staff WHERE username = %s AND password = %s"
+        else:
+            return render_template("login.html", error="Invalid role selected.")
+
+        cursor.execute(query, (identifier, password))
+        user = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        # if login is successful
+        if user:
+            if role == "customer" or role == "Customer":
+                session["user_id"] = user["email"]
+                return redirect("/customer_home")
+            else:
+                session["user_id"] = user["username"]
+                return redirect("/airline_staff_home")
+        else:
+            return render_template("login.html", error="Invalid credentials.")
+        
+    return render_template("login.html")
 
