@@ -1,6 +1,7 @@
 # Import Flask library
-from flask import Flask
-import pymsql.cursor
+from flask import Flask, render_template
+import pymysql
+import pymysql.cursors
 import mysql.connector
 
 # Initialize app from Flask
