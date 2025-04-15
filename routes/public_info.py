@@ -14,6 +14,7 @@ def search_flights():
     conn = get_db_connection()            # connect to the database
     cursor = conn.cursor(dictionary=True) # create a cursor (can return rows as dictionaries)
 
+    # %s is a placeholder 
     query = """
         SELECT * FROM Flight
         WHERE departure_airport = %s
@@ -22,6 +23,13 @@ def search_flights():
         AND departure_date_time > NOW()
     """
 
+    cursor.execute(query, (source, destination, departure_date))
+    flights = cursor.fetchall()  # Fetch the results (flights is a list of dictionaries)
+
     cursor.close()                        # close the cursor
     conn.close()                          # close the connection
+
+    return render_template("home.html", flights=flights)
     
+
+

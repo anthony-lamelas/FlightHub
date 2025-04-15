@@ -15,6 +15,50 @@
     <!-- everything inside the body tag shows up to the user unless modified to not be visible with css -->
 
     <!-- ONLY 1 H1 PER PAGE -->
-    <h1>Hello World!</h1>
+    <h1>Homepage</h1>
+
+    <!-- Flight Search Form (User Input) -->
+    <form method="POST" action="/search">
+      <label for="source">From:</label>
+      <input
+        type="text"
+        name="source"
+        placeholder="e.g. JFK or New York"
+        required
+      />
+
+      <label for="destination">To:</label>
+      <input
+        type="text"
+        name="destination"
+        placeholder="e.g. LAX or Los Angeles"
+        required
+      />
+
+      <label for="departure_date">Departure Date:</label>
+      <input type="date" name="departure_date" required />
+
+      <button type="submit">Search Flights</button>
+    </form>
+
+    <!-- Search Results -->
+    {% if flights %}
+    <!-- Show search results -->
+    <h2>Search Results:</h2>
+    <ul>
+      {% for flight in flights %}
+      <li>
+        <strong>Flight {{ flight.flight_number }}</strong><br />
+        {{ flight.departure_airport }} → {{ flight.arrival_airport }}<br />
+        Departure: {{ flight.departure_date_time }}<br />
+        Arrival: {{ flight.arrival_date_time }}<br />
+        Base Price: ${{ flight.base_price }}
+      </li>
+      {% endfor %}
+    </ul>
+    <!-- If flights is an empty list (None would mean a search has not yet been made) -->
+    {% elif flights is not none %}
+    <p>No flights found for your search.</p>
+    {% endif %}
   </body>
 </html>
