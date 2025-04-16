@@ -3,9 +3,11 @@ from flask import Flask, render_template
 import pymysql
 import pymysql.cursors
 import mysql.connector
+from routes.staff import airline_staff_bp
 
 # Initialize app from Flask
 app = Flask(__name__)
+app.register_blueprint(airline_staff_bp)
 
 # Define route to hello function
 @app.route('/')

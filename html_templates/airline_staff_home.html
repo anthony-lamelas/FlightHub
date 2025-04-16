@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Staff - Future Flights</title>
+</head>
+<body>
+    <h1>Upcoming Flights</h1>
+
+    <table>
+      <tr>
+        <th>Flight Number</th>
+        <th>Departure Airport</th>
+        <th>Arrival Airport</th>
+        <th>Departure Time</th>
+      </tr>
+      {% for flight in flights %}
+      <tr>
+        <td>{{ flight.flight_number }}</td>
+        <td>{{ flight.departure_airport }}</td>
+        <td>{{ flight.arrival_airport }}</td>
+        <td>{{ flight.departure_time }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+
+    <!-- Create Flight Button -->
+    <!-- This link goes to staff/create route -->
+    <br>
+    <a href="{{ url_for('staff.create_flight') }}">Create New Flight</a>
+</body>
+</html>

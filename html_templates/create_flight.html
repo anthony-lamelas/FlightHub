@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create a New Flight</title>
+</head>
+<body>
+    <h1>Create a New Flight</h1>
+    <form method="POST">
+        <label for="flight_number">Flight Number:</label>
+        <input type="text" id="flight_number" name="flight_number" required><br><br>
+
+        <label for="departure_airport">Departure Airport:</label>
+        <input type="text" id="departure_airport" name="departure_airport" required><br><br>
+
+        <label for="arrival_airport">Arrival Airport:</label>
+        <input type="text" id="arrival_airport" name="arrival_airport" required><br><br>
+
+        <label for="departure_time">Departure Time (YYYY-MM-DD HH:MM:SS):</label>
+        <input type="text" id="departure_time" name="departure_time" required><br><br>
+
+        <button type="submit">Create Flight</button>
+    </form>
+    <br>
+    <!-- Link back to staff page -->
+    <a href="{{ url_for('staff.future_flights') }}">Back to Future Flights</a>
+</body>
+</html>
