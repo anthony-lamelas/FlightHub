@@ -1,29 +1,20 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <!-- this specifies the character set encoding.  -->
-    <!-- without this tag our fonts might not load properly -->
     <meta charset="utf-8" />
-
-    <!-- the viewport tag sets the initial scale and ensures proper responsive behavior -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <!-- the title tag shows up in the browser tab -->
     <title>Homepage</title>
   </head>
   <body>
-    <!-- everything inside the body tag shows up to the user unless modified to not be visible with css -->
-
-    <!-- ONLY 1 H1 PER PAGE -->
     <h1>Homepage</h1>
 
-    <!-- Flight Search Form (User Input) -->
+    <!-- Flight Search Form -->
     <form method="POST" action="{{ url_for('public_bp.search_flights') }}">
       <label for="source">From:</label>
       <input
         type="text"
         name="source"
-        placeholder="e.g. JFK or New York"
+        placeholder="e.g. JFK"
         required
       />
 
@@ -31,34 +22,59 @@
       <input
         type="text"
         name="destination"
-        placeholder="e.g. LAX or Los Angeles"
+        placeholder="e.g. LAX"
         required
       />
 
       <label for="departure_date">Departure Date:</label>
       <input type="date" name="departure_date" required />
 
+      <!-- If you support round trips, include a return date field -->
+      <label for="return_date">Return Date (optional):</label>
+      <input type="date" name="return_date" />
+
       <button type="submit">Search Flights</button>
     </form>
 
-    <!-- Search Results -->
-    {% if flights %}
-    <!-- Show search results -->
-    <h2>Search Results:</h2>
-    <ul>
-      {% for flight in flights %}
-      <li>
-        <strong>Flight {{ flight.flight_number }}</strong><br />
-        {{ flight.departure_airport }} → {{ flight.arrival_airport }}<br />
-        Departure: {{ flight.departure_date_time }}<br />
-        Arrival: {{ flight.arrival_date_time }}<br />
-        Base Price: ${{ flight.base_price }}
-      </li>
-      {% endfor %}
-    </ul>
-    <!-- If flights is an empty list (None would mean a search has not yet been made) -->
-    {% elif flights is not none %}
-    <p>No flights found for your search.</p>
+    <!-- Departing Flights Section -->
+    {% if departing_flights is defined %}
+      <h2>Departing Flights</h2>
+      {% if departing_flights %}
+        <ul>
+          {% for flight in departing_flights %}
+          <li>
+            <strong>Flight {{ flight.flight_number }}</strong><br />
+            {{ flight.departure_airport_code }} → {{ flight.arrival_airport_code }}<br />
+            Departure: {{ flight.departure_date_time }}<br />
+            Arrival: {{ flight.arrival_date_time }}<br />
+            Base Price: ${{ flight.base_price }}
+          </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>No departing flights found.</p>
+      {% endif %}
+    {% endif %}
+
+    <!-- Return Flights Section -->
+    {% if return_flights is defined %}
+      <!-- Only show if user searched a return date -->
+      <h2>Return Flights</h2>
+      {% if return_flights %}
+        <ul>
+          {% for flight in return_flights %}
+          <li>
+            <strong>Flight {{ flight.flight_number }}</strong><br />
+            {{ flight.departure_airport_code }} → {{ flight.arrival_airport_code }}<br />
+            Departure: {{ flight.departure_date_time }}<br />
+            Arrival: {{ flight.arrival_date_time }}<br />
+            Base Price: ${{ flight.base_price }}
+          </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>No return flights found.</p>
+      {% endif %}
     {% endif %}
   </body>
 </html>

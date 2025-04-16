@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request
 from db_connection import *
+from datetime import datetime
 
 public_bp = Blueprint('public_bp', __name__)
 
@@ -9,18 +10,23 @@ public_bp = Blueprint('public_bp', __name__)
 def search_flights():
     source = request.form.get("source")
     destination = request.form.get("destination")
-    departure_date = request.form.get("departure_date")
     return_date = request.form.get("return_date")  
+    departure_date = request.form.get("departure_date")
 
+    if not departure_date:
+        return render_template("home.html", error="Please enter a valid departure date.")
+
+    if return_date:
+        return_date = datetime.strptime(return_date, "%Y-%m-%d").strftime("%Y-%m-%d")
 
     conn = get_db_connection()            # connect to the database
     cursor = conn.cursor(dictionary=True) # create a cursor (can return rows as dictionaries)
 
     # %s is a placeholder 
     query = """
-        SELECT * FROM Flight
-        WHERE departure_airport = %s
-        AND arrival_airport = %s
+        SELECT * FROM flight
+        WHERE departure_airport_code = %s
+        AND arrival_airport_code = %s
         AND DATE(departure_date_time) = %s
         AND departure_date_time > NOW()
     """
@@ -30,16 +36,22 @@ def search_flights():
     return_flights = []
     if return_date:
         # flip destination and source for round trip
-        cursor.execture(query, (destination, source, return_date)) 
+        cursor.execute(query, (destination, source, return_date)) 
         return_flights = cursor.fetchall()  
 
+
+    print("Source:", source)
+    print("Destination:", destination)
+    print("Departure Date:", departure_date)
+    print("Flights found:", len(departing_flights))
 
     cursor.close()                        # close the cursor
     conn.close()                          # close the connection
 
     return render_template(
         "home.html", 
-        departing_flights=departing_flights, return_flights=return_flights
+        departing_flights=departing_flights, 
+        return_flights=return_flights
         )
     
 
