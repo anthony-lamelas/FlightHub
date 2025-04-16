@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upcoming Flights</title>
+</head>
+<body>
+    <h1>Upcoming Flights (Next 30 Days)</h1>
+    <table border="1">
+        <tr>
+            <th>Flight Number</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Departure Time</th>
+        </tr>
+        {% for f in flights %}
+        <tr>
+            <td>{{ f.flight_number }}</td>
+            <td>{{ f.departure_airport_code }}</td>
+            <td>{{ f.arrival_airport_code }}</td>
+            <td>{{ f.departure_date_time }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

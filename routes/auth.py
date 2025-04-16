@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, session
 import hashlib 
-from app import get_db_connection
+import mysql.connector
+from db_connection import *
+
 
 auth_bp = Blueprint("auth", __name__)
 
