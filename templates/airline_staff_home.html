@@ -1,25 +1,70 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Upcoming Flights</title>
+  <meta charset="utf-8">
+  <title>Airline Staff – Flight Dashboard</title>
+  <style>
+    table { border-collapse: collapse; width: 100%; margin-top: 1rem; }
+    th, td { border: 1px solid #ccc; padding: .4rem; text-align: center; }
+    tr:nth-child(even) { background: #f7f7f7; }
+    form.inline label { margin-right: .5rem; }
+  </style>
 </head>
 <body>
-    <h1>Upcoming Flights (Next 30 Days)</h1>
-    <table border="1">
+  <h1>{{ airline_name }} – Staff Dashboard</h1>
+
+  <!-- ───── Search / Filter form ───── -->
+  <form class="inline" method="GET" action="{{ url_for('staff.flight_dashboard') }}">
+    <label>From date: <input type="date" name="from_date" value="{{ request.args.get('from_date','') }}"></label>
+    <label>To date:   <input type="date" name="to_date"   value="{{ request.args.get('to_date','') }}"></label>
+    <label>Dep Airport: <input type="text" name="src_code"  size="4" value="{{ request.args.get('src_code','') }}"></label>
+    <label>Arr Airport: <input type="text" name="dest_code" size="4" value="{{ request.args.get('dest_code','') }}"></label>
+    <label>City: <input type="text" name="city" value="{{ request.args.get('city','') }}"></label>
+
+    <button type="submit">Filter</button>
+    <a href="{{ url_for('staff.flight_dashboard') }}">Reset</a>
+  </form>
+
+  <!-- ───── Flights table ───── -->
+  {% if flights %}
+    <table>
+      <thead>
         <tr>
-            <th>Flight Number</th>
-            <th>From</th>
-            <th>To</th>
-            <th>Departure Time</th>
+          <th>Flight #</th><th>Departure</th><th>Arrival</th>
+          <th>Dep Time</th><th>Status</th><th>Passengers</th>
         </tr>
+      </thead>
+      <tbody>
         {% for f in flights %}
         <tr>
-            <td>{{ f.flight_number }}</td>
-            <td>{{ f.departure_airport_code }}</td>
-            <td>{{ f.arrival_airport_code }}</td>
-            <td>{{ f.departure_date_time }}</td>
+          <td>{{ f.flight_number }}</td>
+          <td>{{ f.departure_airport_code }}</td>
+          <td>{{ f.arrival_airport_code }}</td>
+          <td>{{ f.departure_date_time }}</td>
+          <td>{{ f.status }}</td>
+          <td>
+            <a href="{{ url_for('staff.view_flight_customers',
+                                flight_number=f.flight_number,
+                                dep_time=f.departure_date_time|replace(' ','T')) }}">
+              View
+            </a>
+          </td>
         </tr>
         {% endfor %}
+      </tbody>
     </table>
+  {% else %}
+      <p>No flights match this criteria.</p>
+  {% endif %}
+
+  <!-- Passengers list (optional block) -->
+  {% if customers is defined %}
+    <h2>Passengers for Flight {{ sel_flight }}</h2>
+    <ul>
+      {% for c in customers %}
+        <li>{{ c.first_name }} {{ c.last_name }} – {{ c.email }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
 </body>
 </html>

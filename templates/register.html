@@ -1,127 +1,116 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <!-- this specifies the character set encoding.  -->
-    <!-- without this tag our fonts might not load properly -->
-    <meta charset="utf-8" />
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Register</title>
+  <style>
+    button.plus { padding: 0 6px; }
+  </style>
+</head>
+<body>
+  <h1>Register</h1>
 
-    <!-- the viewport tag sets the initial scale and ensures proper responsive behavior -->
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <form method="POST" action="{{ url_for('auth.register') }}">
+    <!-- role selector -->
+    <label>
+      <input type="radio" name="role" value="customer" checked> Customer
+    </label>
+    <label>
+      <input type="radio" name="role" value="staff"> Airline Staff
+    </label>
+    <hr>
 
-    <!-- the title tag shows up in the browser tab -->
-    <title>Register Page</title>
-  </head>
-  <body>
-    <script>
-      function toggleForm() {
-        const role = document.querySelector('input[name="role"]:checked').value;
-        document.getElementById("customer-form").style.display =
-          role === "customer" ? "block" : "none";
-        document.getElementById("staff-form").style.display =
-          role === "staff" ? "block" : "none";
-      }
+    <!-- ─────── Customer fields (visible by default) ─────── -->
+    <div id="customer-form">
+      <h2>Customer Info</h2>
 
-      window.onload = toggleForm; // show correct form on page load
-    </script>
+      <label>First Name:<br><input type="text" name="first_name"></label><br>
+      <label>Last Name:<br><input type="text" name="last_name"></label><br>
+      <label>Building Number:<br><input type="text" name="building_number"></label><br>
+      <label>Street:<br><input type="text" name="street"></label><br>
+      <label>City:<br><input type="text" name="city"></label><br>
+      <label>State:<br><input type="text" name="state"></label><br>
+      <label>Phone Number:<br><input type="text" name="phone_number"></label><br>
+      <label>Passport Number:<br><input type="text" name="passport_number"></label><br>
+      <label>Passport Country:<br><input type="text" name="passport_country"></label><br>
+      <label>Passport Expiration:<br><input type="date" name="passport_expiration"></label><br>
+      <label>Date of Birth:<br><input type="date" name="date_of_birth"></label><br>
+      <label>Email:<br><input type="email" name="email"></label><br>
+      <label>Password:<br><input type="password" name="password"></label><br>
+    </div>
 
-    <!-- ONLY 1 H1 PER PAGE -->
-    <h1>Register</h1>
+    <!-- ─────── Staff fields (hidden initially) ─────── -->
+    <div id="staff-form" style="display:none">
+      <h2>Airline Staff Info</h2>
 
-    <form method="POST" action="/register">
-      <!-- User chooses role -->
-      <label>
-        <input
-          type="radio"
-          name="role"
-          value="customer"
-          checked
-          onchange="toggleForm()"
-        />
-        Customer
-      </label>
-      <label>
-        <input type="radio" name="role" value="staff" onchange="toggleForm()" />
-        Airline Staff
-      </label>
+      <label>Username:<br><input type="text" name="username" required></label><br>
+      <label>First Name:<br><input type="text" name="first_name" required></label><br>
+      <label>Last Name:<br><input type="text" name="last_name" required></label><br>
+      <label>Date of Birth:<br><input type="date" name="date_of_birth" required></label><br>
+      <label>Airline Name:<br><input type="text" name="airline_name" required></label><br>
 
-      <!-- Customer Form -->
-      <div id="customer-form" style="display: none">
-        <h2>Customer Info</h2>
-        <label>First Name:</label>
-        <input type="text" name="first_name" required /><br />
-
-        <label>Last Name:</label>
-        <input type="text" name="last_name" required /><br />
-
-        <label>Building Number:</label>
-        <input type="text" name="building_number" required /><br />
-
-        <label>Street:</label>
-        <input type="text" name="street" required /><br />
-
-        <label>City:</label>
-        <input type="text" name="city" required /><br />
-
-        <label>State:</label>
-        <input type="text" name="state" required /><br />
-
-        <label>Phone Number:</label>
-        <input type="text" name="phone_number" required /><br />
-
-        <label>Passport Number:</label>
-        <input type="text" name="passport_number" required /><br />
-
-        <label>Passport Country:</label>
-        <input type="text" name="passport_country" required /><br />
-
-        <label>Passport Expiration:</label>
-        <input type="date" name="passport_expiration" required /><br />
-
-        <label>Date of Birth:</label>
-        <input type="date" name="date_of_birth" required /><br />
-
-        <label>Email:</label>
-        <input type="email" name="email" required /><br />
-
-        <label>Password:</label>
-        <input type="password" name="password" required /><br />
+      <!-- one required email + plus button -->
+      <label>Emails:</label><br>
+      <div id="email-box">
+        <input type="email" name="email" required>
       </div>
+      <button type="button" class="plus" onclick="addInput('email-box','email','email')">＋</button><br><br>
 
-      <!-- Staff Form -->
-      <div id="staff-form" style="display: none">
-        <h2>Airline Staff Info</h2>
-
-        <label>Username:</label>
-        <input type="text" name="username" required /><br />
-
-        <label>First Name:</label>
-        <input type="text" name="first_name" required /><br />
-
-        <label>Last Name:</label>
-        <input type="text" name="last_name" required /><br />
-
-        <label>Date of Birth:</label>
-        <input type="date" name="date_of_birth" required /><br />
-
-        <label>Airline Name:</label>
-        <input type="text" name="airline_name" required /><br />
-
-        <label>Emails:</label><br />
-        <input type="email" name="email" required /><br />
-        <input type="email" name="email" /><br />
-        <!-- Optional second email -->
-
-        <label>Phone Numbers:</label><br />
-        <input type="text" name="phone_number" required /><br />
-        <input type="text" name="phone_number" /><br />
-        <!-- Optional second phone -->
-
-        <label>Password:</label>
-        <input type="password" name="password" required /><br />
+      <!-- one required phone + plus button -->
+      <label>Phone Numbers:</label><br>
+      <div id="phone-box">
+        <input type="text" name="phone_number" required>
       </div>
+      <button type="button" class="plus" onclick="addInput('phone-box','phone_number')">＋</button><br><br>
 
-      <br />
-      <button type="submit">Register</button>
-    </form>
-  </body>
+      <label>Password:<br><input type="password" name="password" required></label><br>
+    </div>
+
+    <button type="submit">Register</button>
+  </form>
+
+  {% if error %}
+    <p style="color:red;">{{ error }}</p>
+  {% endif %}
+
+  <!-- ───── minimal JS helpers (at page end so DOM exists) ───── -->
+  <script>
+    function toggleBlock(block, enable) {
+      block.style.display = enable ? "block" : "none";
+      block.querySelectorAll("input").forEach(el => {
+        if (enable) {
+          el.removeAttribute("disabled");
+        } else {
+          el.value = "";
+          el.setAttribute("disabled", "disabled");
+        }
+      });
+    }
+
+    function toggleForm() {
+      const role = document.querySelector('input[name="role"]:checked').value;
+      toggleBlock(document.getElementById("customer-form"), role === "customer");
+      toggleBlock(document.getElementById("staff-form"),    role === "staff");
+    }
+
+    function addInput(containerId, name, type="text") {
+      const div = document.createElement("div");
+      div.innerHTML = `<input type="${type}" name="${name}" class="extra">`;
+      document.getElementById(containerId).appendChild(div);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      /* restore role after server‑side error */
+      const selected = "{{ selected_role | default('customer') }}";
+      const radio = document.querySelector(`input[name="role"][value="${selected}"]`);
+      if (radio) radio.checked = true;
+
+      /* set initial visibility and bind change events */
+      toggleForm();
+      document.querySelectorAll('input[name="role"]').forEach(r =>
+        r.addEventListener("change", toggleForm));
+    });
+  </script>
+</body>
 </html>
