@@ -8,10 +8,19 @@
     th, td { border: 1px solid #ccc; padding: .4rem; text-align: center; }
     tr:nth-child(even) { background: #f7f7f7; }
     form.inline label { margin-right: .5rem; }
+    .action-bar { margin: 1rem 0; }
+    .action-bar button { padding: .6rem 1.2rem; }
   </style>
 </head>
 <body>
   <h1>{{ airline_name }} – Staff Dashboard</h1>
+
+  <!-- Create Flight Button -->
+  <div class="action-bar">
+    <a href="/staff/create">
+      <button type="button">Create Flight</button>
+    </a>
+  </div>
 
   <!-- ───────── Search / Filter form ───────── -->
   <form class="inline" method="GET" action="{{ url_for('airline_staff_bp.flight_dashboard') }}">
@@ -44,7 +53,12 @@
           <td>
             <a href="{{ url_for('airline_staff_bp.view_flight_customers',
                                 flight_number=f.flight_number,
-                                dep_time=f.departure_date_time|replace(' ','T')) }}">
+                                dep_time=f.departure_date_time|replace(' ','T'),
+                                from_date=request.args.get('from_date',''),
+                                to_date=request.args.get('to_date',''),
+                                src_code=request.args.get('src_code',''),
+                                dest_code=request.args.get('dest_code','')
+                               ) }}">
               View
             </a>
           </td>
