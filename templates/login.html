@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Login Page</title>
   </head>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const selected = "{{ selected_role | default('customer') }}";
+      const radio    = document.querySelector(
+                       `input[name="role"][value="${selected}"]`);
+      if (radio) radio.checked = true;
+    });
+    </script>
+    
   <body>
     <h1>Login</h1>
 
@@ -52,7 +61,7 @@
         <input
           type="text"
           id="customer-email"
-          name="identifier"
+          name="customer_identifier"
           required
         /><br />
 
@@ -60,7 +69,7 @@
         <input
           type="password"
           id="customer-password"
-          name="password"
+          name="customer_password"
           required
         /><br />
 
@@ -73,7 +82,7 @@
         <input
           type="text"
           id="staff-username"
-          name="identifier"
+          name="staff_identifier"
           required
         /><br />
 
@@ -81,7 +90,7 @@
         <input
           type="password"
           id="staff-password"
-          name="password"
+          name="staff_password"
           required
         /><br />
 

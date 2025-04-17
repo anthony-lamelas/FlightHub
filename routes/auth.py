@@ -111,45 +111,51 @@ def register():
                            error="Registration failed. Please check your input.", 
                            selected_role = role)
 
-
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        role = request.form.get("role")
-        identifier = request.form.get("identifier")  # email for customer, username for staff
-        password = request.form.get("password")
-        password = hashlib.md5(password.encode()).hexdigest()
+        role = request.form.get("role", "").lower()
 
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
-
-        if role.lower() == "customer":
+        # Pull the correct identifier + password field
+        if role == "customer":
+            identifier = request.form.get("customer_identifier")
+            password   = request.form.get("customer_password")
             query = "SELECT * FROM customers WHERE email = %s AND password = %s"
-        elif role.lower() == "staff":
+        elif role == "staff":
+            identifier = request.form.get("staff_identifier")
+            password   = request.form.get("staff_password")
             query = "SELECT * FROM airline_staff WHERE username = %s AND password = %s"
         else:
             return render_template("login.html",
-                                error="Invalid role selected.",
-                                selected_role=role)
+                                   error="Invalid role selected.",
+                                   selected_role=role)
 
-        cursor.execute(query, (identifier, password))
+        # Hash password
+        if password is None or identifier is None:
+            return render_template("login.html",
+                                   error="Missing credentials.",
+                                   selected_role=role)
+
+        hashed_pw = hashlib.md5(password.encode()).hexdigest()
+
+        print("Trying login with:", identifier, hashed_pw)
+
+        # Run query
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(query, (identifier, hashed_pw))
         user = cursor.fetchone()
-
         cursor.close()
         conn.close()
 
-        # if login is successful
+        # Handle success/failure
         if user:
-            if role == "customer" or role == "Customer":
-                session["user_id"] = user["email"]
-                return redirect("/customer_home")
-            else:
-                session["user_id"] = user["username"]
-                return redirect("/staff/home")
+            session["user_id"] = user["email"] if role == "customer" else user["username"]
+            return redirect("/customer_home" if role == "customer" else "/staff/home")
         else:
-            return render_template("login.html", 
+            return render_template("login.html",
                                    error="Invalid credentials.",
                                    selected_role=role)
-        
-    return render_template("login.html",selected_role="customer")
 
+    # GET request
+    return render_template("login.html", selected_role="customer")

@@ -11,6 +11,7 @@ from routes.public_info import public_bp
 
 # Initialize app from Flask
 app = Flask(__name__)
+app.secret_key = 'secret-key'
 app.register_blueprint(airline_staff_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(public_bp)
