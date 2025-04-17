@@ -95,7 +95,7 @@ def register():
             cursor.close()
             conn.close()
             return redirect("/login")
-        return render_template("register.html", selected_role=role)
+        return render_template("register.html")
         
     # If error
     except IntegrityError as e:
