@@ -40,3 +40,40 @@ def view_my_flights():
         flash('Please log in to view your flights.')
         return redirect(url_for('login'))
 
+customer_bp.route('/search_flights', methods=['GET', 'POST'])
+def search_flights():
+    if 'user_id' not in session:
+        flash('Please log in to search for flights.')
+        return redirect('/login')
+
+    if request.method == 'POST':
+        source = request.form.get('source')
+        destination = request.form.get('destination')
+        departure_date = request.form.get('departure_date')
+
+        cursor = mysql.connection.cursor()
+        
+        try:
+            query = '''
+                SELECT f.airline_name, f.flight_num, f.departure_airport, f.arrival_airport, 
+                f.departure_date, f.departure_time, f.arrival_date, f.arrival_time, f.base_price
+                FROM flight f
+                WHERE f.departure_airport = %s 
+                AND f.arrival_airport = %s 
+                AND f.departure_date >= %s
+                ORDER BY f.departure_date ASC, f.departure_time ASC
+            '''
+            cursor.execute(query, (source, destination, departure_date))
+            flights = cursor.fetchall()
+
+            if not flights:
+                flash('No flights found based on the search criteria.')
+        except Exception as e:
+            flash(f'Error occurred while searching for flights: {str(e)}')
+        finally:
+            cursor.close()
+
+        return render_template('flight_results.html', flights=flights)
+
+    return render_template('search_flights.html')
+
