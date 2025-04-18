@@ -1,4 +1,6 @@
-from flask import Blueprint, render_template, session, redirect
+from flask import Blueprint, render_template, session, redirect, flash, url_for, request
+import mysql.connector
+
 
 customer_bp = Blueprint('customer_bp', __name__)
 
