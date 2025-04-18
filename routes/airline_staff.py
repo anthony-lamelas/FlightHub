@@ -3,7 +3,7 @@ from db_connection import *
 
 airline_staff_bp = Blueprint(
     'airline_staff_bp', __name__,
-    template_folder="html_templates",
+    template_folder="templates",
     url_prefix='/staff'
 )
 
