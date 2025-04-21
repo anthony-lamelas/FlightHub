@@ -1,80 +1,89 @@
-from flask import Blueprint, render_template, session, redirect, request, flash
+from flask import Blueprint, render_template, session, redirect, request, flash, url_for
 import mysql.connector
+from db_connection import *
 
 customer_bp = Blueprint('customer_bp', __name__)
 
-@customer_bp.route("/customer_home")
+# Main customer home shows future flights by default
+@customer_bp.route("/customer_home", methods=["GET", "POST"])
 def customer_home():
-    if "user_id" not in session:
+    if "user_id" not in session or session.get("user_type") != "customer":
         return redirect("/login")
-    return render_template("customer_home.html")
 
-@customer_bp.route('/customer_homepage/view_my_flights')
-def view_my_flights():
-    if 'user_id' in session and session.get('user_type') == 'customer':
-        email = session.get('user_email')
-        cursor = mysql.connection.cursor()
+    user_email = session.get("user_id")
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
 
-        cursor.execute("""
-            SELECT t.*, f.departure_date_and_time, f.arrival_date_and_time, 
-                   f.departure_airport_code, f.arrival_airport_code, f.status
-            FROM ticket t
-            JOIN flight f ON t.flight_number = f.flight_number
-            WHERE t.email = %s AND f.departure_date_and_time > NOW()
-            ORDER BY f.departure_date_and_time
-            """, [email])
-        upcoming_flights = cursor.fetchall()
+    # Handle flight filtering (optional)
+    query = """
+        SELECT flight_number, departure_airport_code, arrival_airport_code,
+               departure_date_time, arrival_date_time, flight_status
+        FROM flight
+        WHERE departure_date_time > NOW()
+    """
+    filters = []
+    values = []
 
-        cursor.execute("""
-            SELECT t.*, f.departure_date_and_time, f.arrival_date_and_time, 
-                   f.departure_airport_code, f.arrival_airport_code, f.status
-            FROM ticket t
-            JOIN flight f ON t.flight_number = f.flight_number
-            WHERE t.email = %s AND f.departure_date_and_time < NOW()
-            ORDER BY f.departure_date_and_time DESC
-            """, [email])
-        past_flights = cursor.fetchall()
+    if request.method == "POST" and 'filter_type' not in request.form:
+        from_date = request.form.get("from_date")
+        to_date = request.form.get("to_date")
+        src_code = request.form.get("src_code")
+        dest_code = request.form.get("dest_code")
 
-        cursor.close()
-        return render_template('view_my_flights.html', upcoming_flights=upcoming_flights, past_flights=past_flights)
+        if from_date:
+            filters.append("DATE(departure_date_time) >= %s")
+            values.append(from_date)
+        if to_date:
+            filters.append("DATE(departure_date_time) <= %s")
+            values.append(to_date)
+        if src_code:
+            filters.append("departure_airport_code = %s")
+            values.append(src_code.upper())
+        if dest_code:
+            filters.append("arrival_airport_code = %s")
+            values.append(dest_code.upper())
+
+    if filters:
+        query += " AND " + " AND ".join(filters)
+
+    query += " ORDER BY departure_date_time"
+    cursor.execute(query, values)
+    upcoming_flights = cursor.fetchall()
+
+    # Purchased flights toggle
+    filter_type = request.form.get("filter_type", "future")  # default to future
+    if filter_type == "past":
+        purchase_query = """
+            SELECT f.flight_number, f.departure_airport_code, f.arrival_airport_code,
+                   f.departure_date_time, f.arrival_date_time, f.flight_status
+            FROM Purchase p
+            JOIN Ticket t ON p.ticket_id = t.ticket_id
+            JOIN Flight f ON t.airline_name = f.airline_name
+                         AND t.flight_number = f.flight_number
+                         AND t.departure_date_time = f.departure_date_time
+            WHERE p.email = %s AND f.departure_date_time < NOW()
+            ORDER BY f.departure_date_time DESC
+        """
     else:
-        flash('Please log in to view your flights.')
-        return redirect(url_for('login'))
+        purchase_query = """
+            SELECT f.flight_number, f.departure_airport_code, f.arrival_airport_code,
+                   f.departure_date_time, f.arrival_date_time, f.flight_status
+            FROM Purchase p
+            JOIN Ticket t ON p.ticket_id = t.ticket_id
+            JOIN Flight f ON t.airline_name = f.airline_name
+                         AND t.flight_number = f.flight_number
+                         AND t.departure_date_time = f.departure_date_time
+            WHERE p.email = %s AND f.departure_date_time >= NOW()
+            ORDER BY f.departure_date_time
+        """
 
-customer_bp.route('/search_flights', methods=['GET', 'POST'])
-def search_flights():
-    if 'user_id' not in session:
-        flash('Please log in to search for flights.')
-        return redirect('/login')
+    cursor.execute(purchase_query, (user_email,))
+    purchased_flights = cursor.fetchall()
 
-    if request.method == 'POST':
-        source = request.form.get('source')
-        destination = request.form.get('destination')
-        departure_date = request.form.get('departure_date')
+    cursor.close()
+    conn.close()
 
-        cursor = mysql.connection.cursor()
-        
-        try:
-            query = '''
-                SELECT f.airline_name, f.flight_num, f.departure_airport, f.arrival_airport, 
-                f.departure_date, f.departure_time, f.arrival_date, f.arrival_time, f.base_price
-                FROM flight f
-                WHERE f.departure_airport = %s 
-                AND f.arrival_airport = %s 
-                AND f.departure_date >= %s
-                ORDER BY f.departure_date ASC, f.departure_time ASC
-            '''
-            cursor.execute(query, (source, destination, departure_date))
-            flights = cursor.fetchall()
-
-            if not flights:
-                flash('No flights found based on the search criteria.')
-        except Exception as e:
-            flash(f'Error occurred while searching for flights: {str(e)}')
-        finally:
-            cursor.close()
-
-        return render_template('flight_results.html', flights=flights)
-
-    return render_template('search_flights.html')
-
+    return render_template("customer_home.html",
+                           upcoming_flights=upcoming_flights,
+                           purchased_flights=purchased_flights,
+                           filter_type=filter_type)

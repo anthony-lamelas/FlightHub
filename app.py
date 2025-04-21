@@ -8,6 +8,7 @@ from db_connection import *
 from routes.airline_staff import airline_staff_bp
 from routes.auth import auth_bp
 from routes.public_info import public_bp
+from routes.customer import customer_bp
 
 # Initialize app from Flask
 app = Flask(__name__)
@@ -15,6 +16,7 @@ app.secret_key = 'secret-key'
 app.register_blueprint(airline_staff_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(public_bp)
+app.register_blueprint(customer_bp)
 
 # Run the app on localhost
 # debug = True -> you don't have to restart flask

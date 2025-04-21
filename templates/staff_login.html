@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Staff Login</title>
+  <style>
+    body {
+      background-color: aliceblue;
+      font-family: sans-serif;
+      padding: 2rem;
+    }
+    label, input {
+      display: block;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Airline Staff Login</h1>
+  <form method="POST" action="/login">
+    <input type="hidden" name="role" value="staff" />
+
+    <label for="username">Username:</label>
+    <input type="text" name="staff_identifier" id="username" required>
+
+    <label for="password">Password:</label>
+    <input type="password" name="staff_password" id="password" required>
+
+    <button type="submit">Login</button>
+  </form>
+
+  {% if error %}
+    <p style="color: red;">{{ error }}</p>
+  {% endif %}
+</body>
+</html>

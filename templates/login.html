@@ -17,7 +17,11 @@
       const radio = document.querySelector(
         `input[name="role"][value="${selected}"]`
       );
-      if (radio) radio.checked = true;
+      if (radio) {
+        radio.checked = true;
+        toggleForm
+      }
+      
     });
   </script>
 
