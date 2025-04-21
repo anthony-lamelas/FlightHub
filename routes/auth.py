@@ -7,6 +7,14 @@ from mysql.connector.errors import IntegrityError
 
 auth_bp = Blueprint("auth", __name__)
 
+@auth_bp.route("/login/customer", methods=["GET"])
+def customer_login():
+    return render_template("customer_login.html")
+
+@auth_bp.route("/login/staff", methods=["GET"])
+def staff_login():
+    return render_template("staff_login.html")
+
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
     try:        
@@ -80,7 +88,7 @@ def register():
             conn.commit()
             cursor.close()
             conn.close()
-            return redirect("/login")
+            return redirect("/")
         return render_template("register.html")
         
     except IntegrityError as e:
