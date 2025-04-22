@@ -1,34 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Flights</title>
-  <style>
-    table { border-collapse: collapse; width: 100%; margin-top: 1rem; }
-    th, td { border: 1px solid #ccc; padding: .4rem; text-align: center; }
-    tr:nth-child(even) { background: #f7f7f7; }
-    form.inline label { margin-right: .5rem; }
-  </style>
-</head>
-<body>
-  <h1>My Flights</h1>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Flights</title>
+    <style>
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 1rem;
+      }
+      th,
+      td {
+        border: 1px solid #ccc;
+        padding: 0.4rem;
+        text-align: center;
+      }
+      tr:nth-child(even) {
+        background: #f7f7f7;
+      }
+      form.inline label {
+        margin-right: 0.5rem;
+      }
+      button {
+        padding: 0.3rem 0.6rem;
+        margin-top: 0.4rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>My Flights</h1>
 
-  <!-- ───────── Search Form ───────── -->
-  <form class="inline" method="POST" action="{{ url_for('customer_bp.customer_home') }}">
-    <label>From date: <input type="date" name="from_date" value="{{ request.form.get('from_date','') }}"></label>
-    <label>To date:   <input type="date" name="to_date"   value="{{ request.form.get('to_date','') }}"></label>
-    <label>Dep Airport: <input type="text" name="src_code"  size="4" value="{{ request.form.get('src_code','') }}"></label>
-    <label>Arr Airport: <input type="text" name="dest_code" size="4" value="{{ request.form.get('dest_code','') }}"></label>
+    <!-- ───────── Search Form ───────── -->
+    <form
+      class="inline"
+      method="POST"
+      action="{{ url_for('customer_bp.customer_home') }}"
+    >
+      <label
+        >From date:
+        <input
+          type="date"
+          name="from_date"
+          value="{{ request.form.get('from_date','') }}"
+      /></label>
+      <label
+        >To date:
+        <input
+          type="date"
+          name="to_date"
+          value="{{ request.form.get('to_date','') }}"
+      /></label>
+      <label
+        >Dep Airport:
+        <input
+          type="text"
+          name="src_code"
+          size="4"
+          value="{{ request.form.get('src_code','') }}"
+      /></label>
+      <label
+        >Arr Airport:
+        <input
+          type="text"
+          name="dest_code"
+          size="4"
+          value="{{ request.form.get('dest_code','') }}"
+      /></label>
 
-    <button type="submit">Filter</button>
-    <a href="{{ url_for('customer_bp.customer_home') }}">Reset</a>
-  </form>
+      <button type="submit">Filter</button>
+      <a href="{{ url_for('customer_bp.customer_home') }}">Reset</a>
+    </form>
 
-  <!-- ───────── Upcoming Flights ───────── -->
-  <div>
-    <h2>Upcoming Flights</h2>
-    {% if upcoming_flights %}
+    <!-- ───────── Upcoming Flights ───────── -->
+    <div>
+      <h2>Upcoming Flights</h2>
+      {% if upcoming_flights %}
       <table>
         <thead>
           <tr>
@@ -42,53 +89,52 @@
         </thead>
         <tbody>
           {% for flight in upcoming_flights %}
-            <tr>
-              <td>{{ flight.flight_number }}</td>
-              <td>{{ flight.departure_airport_code }}</td>
-              <td>{{ flight.arrival_airport_code }}</td>
-              <td>{{ flight.departure_date_time }}</td>
-              <td>{{ flight.arrival_date_time }}</td>
-              <td>{{ flight.flight_status }}</td>
-            </tr>
+          <tr>
+            <td>{{ flight.flight_number }}</td>
+            <td>{{ flight.departure_airport_code }}</td>
+            <td>{{ flight.arrival_airport_code }}</td>
+            <td>{{ flight.departure_date_time }}</td>
+            <td>{{ flight.arrival_date_time }}</td>
+            <td>{{ flight.flight_status }}</td>
+          </tr>
           {% endfor %}
         </tbody>
       </table>
-    {% else %}
+      {% else %}
       <p>No upcoming flights found.</p>
-    {% endif %}
-  </div>
-  <!-- ───────── Purchased Flights ───────── -->
-<!-- ───────── Toggle for Purchased Flights ───────── -->
-<h2>My Booked Flights</h2>
-<form method="POST" style="margin-bottom: 1rem;">
-  <input type="hidden" name="filter_type" value="future">
-  <button type="submit">Upcoming</button>
-</form>
-<form method="POST" style="margin-bottom: 1rem;">
-  <input type="hidden" name="filter_type" value="past">
-  <button type="submit">Past</button>
-</form>
+      {% endif %}
+    </div>
 
-{% if filter_type == 'past' %}
-  <h3>Past Flights</h3>
-{% else %}
-  <h3>Upcoming Flights</h3>
-{% endif %}
+    <!-- ───────── Purchased Flights Section ───────── -->
+    <h2>My Booked Flights</h2>
+    <form method="POST" style="margin-bottom: 1rem">
+      <input type="hidden" name="filter_type" value="future" />
+      <button type="submit">Upcoming</button>
+    </form>
+    <form method="POST" style="margin-bottom: 1rem">
+      <input type="hidden" name="filter_type" value="past" />
+      <button type="submit">Past</button>
+    </form>
 
-{% if purchased_flights %}
-  <table>
-    <thead>
-      <tr>
-        <th>Flight Number</th>
-        <th>Departure</th>
-        <th>Arrival</th>
-        <th>Departure Date & Time</th>
-        <th>Arrival Date & Time</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for flight in purchased_flights %}
+    {% if filter_type == 'past' %}
+    <h3>Past Flights</h3>
+    {% else %}
+    <h3>Upcoming Flights</h3>
+    {% endif %} {% if purchased_flights %}
+    <table>
+      <thead>
+        <tr>
+          <th>Flight Number</th>
+          <th>Departure</th>
+          <th>Arrival</th>
+          <th>Departure Date & Time</th>
+          <th>Arrival Date & Time</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for flight in purchased_flights %}
         <tr>
           <td>{{ flight.flight_number }}</td>
           <td>{{ flight.departure_airport_code }}</td>
@@ -96,14 +142,30 @@
           <td>{{ flight.departure_date_time }}</td>
           <td>{{ flight.arrival_date_time }}</td>
           <td>{{ flight.flight_status }}</td>
+          <td>
+            {% if flight.departure_date_time > current_time_plus_24 %}
+            <form
+              action="{{ url_for('customer_bp.cancel_ticket') }}"
+              method="POST"
+              style="display: inline"
+            >
+              <input
+                type="hidden"
+                name="ticket_id"
+                value="{{ flight.ticket_id }}"
+              />
+              <button type="submit">Cancel Ticket</button>
+            </form>
+            {% else %}
+            <em>Cannot cancel</em>
+            {% endif %}
+          </td>
         </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-{% else %}
-  <p>No {{ filter_type }} flights found.</p>
-{% endif %}
-  </div>
-  
-</body>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p>No {{ filter_type }} flights found.</p>
+    {% endif %}
+  </body>
 </html>

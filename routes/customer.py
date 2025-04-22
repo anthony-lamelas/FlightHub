@@ -55,7 +55,7 @@ def customer_home():
     filter_type = request.form.get("filter_type", "future")  # default to future
     if filter_type == "past":
         purchase_query = """
-            SELECT f.flight_number, f.departure_airport_code, f.arrival_airport_code,
+            SELECT t.ticket_id, f.flight_number, f.departure_airport_code, f.arrival_airport_code,
                    f.departure_date_time, f.arrival_date_time, f.flight_status
             FROM Purchase p
             JOIN Ticket t ON p.ticket_id = t.ticket_id
@@ -67,7 +67,7 @@ def customer_home():
         """
     else:
         purchase_query = """
-            SELECT f.flight_number, f.departure_airport_code, f.arrival_airport_code,
+            SELECT t.ticket_id, f.flight_number, f.departure_airport_code, f.arrival_airport_code,
                    f.departure_date_time, f.arrival_date_time, f.flight_status
             FROM Purchase p
             JOIN Ticket t ON p.ticket_id = t.ticket_id
@@ -80,6 +80,7 @@ def customer_home():
 
     cursor.execute(purchase_query, (user_email,))
     purchased_flights = cursor.fetchall()
+    current_time_plus_24 = datetime.now() + timedelta(hours=24)
 
     cursor.close()
     conn.close()
@@ -87,7 +88,8 @@ def customer_home():
     return render_template("customer_home.html",
                            upcoming_flights=upcoming_flights,
                            purchased_flights=purchased_flights,
-                           filter_type=filter_type)
+                           filter_type=filter_type,
+                           current_time_plus_24=current_time_plus_24)
 
 
 @customer_bp.route("/purchase_ticket", methods=["POST"])
@@ -131,7 +133,7 @@ def purchase_ticket():
     cursor.execute("SELECT number_of_seats FROM Airplane WHERE airplane_id = %s", (airplane_id,))
     capacity = cursor.fetchone()[0]  # returns number_of_seats
 
-    # Step 3: Count existing tickets
+    # Step 3: Count existing tickets that have been booked
     cursor.execute("""
         SELECT COUNT(*) FROM Ticket
         WHERE flight_number = %s AND departure_date_time = %s AND airline_name = %s
@@ -152,13 +154,9 @@ def purchase_ticket():
 
     # Step 6: Insert into Ticket
     cursor.execute("""
-        INSERT INTO Ticket (ticket_id,
-        airline_name,
-        flight_number,
-        departure_date_time,
-        śold_price)
+        INSERT INTO Ticket (airline_name, flight_number, departure_date_time, sold_price)
         VALUES (%s, %s, %s, %s)
-    """, (ticket_id, airline_name, flight_number, departure_date_time, sold_price))
+    """, (airline_name, flight_number, departure_date_time, sold_price))
 
     ticket_id = cursor.lastrowid  # gets the ticket_id from the last row entered
 
@@ -183,4 +181,49 @@ def purchase_ticket():
 
 @customer_bp.route("/cancel_ticket", methods=["POST"])
 def cancel_ticket():
+    if "user_id" not in session or session.get("user_type") != "customer":
+        return redirect("/login")
     
+    user_email = session["user_id"]
+    ticket_id = request.form.get("ticket_id")
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    # Step 1: Get flight time for that ticket
+    cursor.execute("""
+        SELECT f.departure_date_time
+        FROM Purchase p
+        JOIN Ticket t ON p.ticket_id = t.ticket_id
+        JOIN Flight f ON t.flight_number = f.flight_number
+                    AND t.departure_date_time = f.departure_date_time
+                    AND t.airline_name = f.airline_name
+        WHERE p.email = %s AND p.ticket_id = %s
+    """, (user_email, ticket_id))
+
+    search_result = cursor.fetchone()
+
+    # If not result
+    if not search_result:
+        flash("Ticket not found or you don't own this ticket.")
+        cursor.close()
+        conn.close()
+        return redirect("/customer_home")
+    
+    departure_time = search_result["departure_date_time"]
+    curr_time_plus_24 = datetime.now() + timedelta(hours=24)
+
+    # Step 2: Check timing
+    if departure_time <= curr_time_plus_24:
+        flash("You can only cancel tickets for flights more than 24 hours in the future.")
+    else:
+        # Step 3: Cancel the ticket if more than 24 hours in the future (delete Purchase & Ticket)
+        cursor.execute("DELETE FROM Purchase WHERE ticket_id = %s AND email = %s", (ticket_id, user_email)) # removes ownership of ticket by the customer
+        cursor.execute("DELETE FROM Ticket WHERE ticket_id = %s", (ticket_id,))  # removes booked ticket from Ticket system; now that ticket is available to be purchased
+        conn.commit()
+        flash("Ticket canceled successfully.")
+    
+
+    cursor.close()
+    conn.close()
+    return redirect("/customer_home")
