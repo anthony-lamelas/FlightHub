@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Purchase Ticket</title>
+  </head>
+  <body>
+    <h2>Confirm Ticket Purchase</h2>
+
+    <form method="POST" action="{{ url_for('customer_bp.purchase_ticket') }}">
+      <!-- These hidden fields come from the flight selection -->
+      <input
+        type="hidden"
+        name="flight_number"
+        value="{{ flight.flight_number }}"
+      />
+      <input
+        type="hidden"
+        name="departure_date_time"
+        value="{{ flight.departure_date_time }}"
+      />
+
+      <p><strong>Flight:</strong> {{ flight.flight_number }}</p>
+      <p>
+        <strong>From:</strong> {{ flight.departure_airport_code }} to {{
+        flight.arrival_airport_code }}
+      </p>
+      <p><strong>Departure:</strong> {{ flight.departure_date_time }}</p>
+      <p><strong>Base Price:</strong> ${{ flight.base_price }}</p>
+
+      <hr />
+
+      <label for="first_name">First Name:</label><br />
+      <input type="text" name="first_name" required /><br /><br />
+
+      <label for="last_name">Last Name:</label><br />
+      <input type="text" name="last_name" required /><br /><br />
+
+      <label for="date_of_birth">Date of Birth:</label><br />
+      <input type="date" name="date_of_birth" required /><br /><br />
+
+      <label for="card_type">Card Type:</label><br />
+      <select name="card_type" required>
+        <option value="credit">Credit</option>
+        <option value="debit">Debit</option></select
+      ><br /><br />
+
+      <label for="card_number">Card Number:</label><br />
+      <input type="number" name="card_number" required /><br /><br />
+
+      <label for="name_on_card">Name on Card:</label><br />
+      <input type="text" name="name_on_card" required /><br /><br />
+
+      <label for="expiration_date">Expiration Date:</label><br />
+      <input type="month" name="expiration_date" required /><br /><br />
+
+      <button type="submit">Purchase Ticket</button>
+    </form>
+  </body>
+</html>
