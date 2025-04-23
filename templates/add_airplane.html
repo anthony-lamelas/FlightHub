@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Airplane</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Add New Airplane</h1>
+    <a href="{{ url_for('airline_staff_bp.flight_dashboard') }}">Back to Dashboard</a>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+        <label for="airplane_id">Airplane ID:</label>
+        <input type="text" name="airplane_id" required>
+
+        <label for="num_of_seats">Number of Seats:</label>
+        <input type="number" name="num_of_seats" required>
+
+        <label for="manufacturing_company">Manufacturing Company:</label>
+        <input type="text" name="manufacturing_company" required>
+
+        <label for="model_number">Model Number:</label>
+        <input type="text" name="model_number" required>
+
+        <label for="manufacturing_date">Manufacturing Date:</label>
+        <input type="date" name="manufacturing_date" required>
+
+        <label for="age">Age of Airplane:</label>
+        <input type="number" name="age" required>
+
+        <button type="submit">Add Airplane</button>
+    </form>
+</body>
+</html>
