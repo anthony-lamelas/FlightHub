@@ -175,6 +175,95 @@ def create_flight():
         cursor.close()
         conn.close()
 
+       # ----------------------------- Have not tested yet-----------------
+@airline_staff_bp.route('/change_status/<string:flight_number>', methods=['GET', 'POST'])
+def change_flight_status(flight_number):
+    if "user_id" in session:
+        airline_name = get_staff_airline()
+        if airline_name is None:
+            flash('You do not have permission to access this page.')
+            return redirect(url_for('airline_staff_bp.flight_dashboard'))
+
+        if request.method == 'POST':
+            new_status = request.form.get('flight_status')
+
+            conn = get_db_connection()
+            cursor = conn.cursor()
+
+            try:
+                cursor.execute(
+                    """
+                    UPDATE flight
+                    SET flight_status = %s
+                    WHERE flight_number = %s
+                    AND airline_name = %s
+                    """,
+                    (new_status, flight_number, airline_name)
+                )
+                conn.commit()
+                flash('Flight status updated successfully.')
+            except Exception as e:
+                flash(f'Error updating flight status: {str(e)}')
+            finally:
+                cursor.close()
+                conn.close()
+
+            return redirect(url_for('airline_staff_bp.flight_dashboard'))
+        
+        return render_template('change_flight_status.html', flight_number=flight_number)
+    else:
+        flash('Please log in as staff to access this page.')
+        return redirect(url_for('login'))
+
+
+@airline_staff_bp.route('/add_airplane', methods=['GET', 'POST'])
+def add_airplane():
+    if "user_id" in session:
+        airline_name = get_staff_airline()
+        if airline_name is None:
+            flash('You do not have permission to add airplanes.')
+            return redirect(url_for('airline_staff_bp.flight_dashboard'))
+
+        if request.method == 'POST':
+            airplane_id = request.form.get('airplane_id')
+            num_of_seats = request.form.get('num_of_seats')
+            manufacturing_company = request.form.get('manufacturing_company')
+            model_number = request.form.get('model_number')
+            manufacturing_date = request.form.get('manufacturing_date')
+            age = request.form.get('age')
+
+            conn = get_db_connection()
+            cursor = conn.cursor()
+
+            try:
+                cursor.execute(
+                    """
+                    INSERT INTO airplane (
+                        airplane_id, num_of_seats, manufacturing_company, model_number, 
+                        manufacturing_date, age, airline_name
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s)
+                    """,
+                    (airplane_id, num_of_seats, manufacturing_company, model_number, 
+                     manufacturing_date, age, airline_name)
+                )
+                conn.commit()
+                flash('New airplane added successfully.')
+            except Exception as e:
+                flash(f'Error adding airplane: {str(e)}')
+            finally:
+                cursor.close()
+                conn.close()
+
+            return redirect(url_for('airline_staff_bp.flight_dashboard'))
+        
+        return render_template('add_airplane.html')
+    else:
+        flash('Please log in as staff to access this page.')
+        return redirect(url_for('login'))
+
+    #-------------------worked upto here-----------------------------
+
+
         # back to the dashboard
         return redirect("/staff/home")
 
