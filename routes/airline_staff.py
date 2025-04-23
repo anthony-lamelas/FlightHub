@@ -181,7 +181,7 @@ def change_flight_status(flight_number):
     if "user_id" in session:
         airline_name = get_staff_airline()
         if airline_name is None:
-            flash('You do not have permission to access this page.')
+            flash('Unauthorized to access this page.')
             return redirect(url_for('airline_staff_bp.flight_dashboard'))
 
         if request.method == 'POST':
@@ -201,7 +201,7 @@ def change_flight_status(flight_number):
                     (new_status, flight_number, airline_name)
                 )
                 conn.commit()
-                flash('Flight status updated successfully.')
+                flash('Flight status has been updated successfully.')
             except Exception as e:
                 flash(f'Error updating flight status: {str(e)}')
             finally:
@@ -212,7 +212,7 @@ def change_flight_status(flight_number):
         
         return render_template('change_flight_status.html', flight_number=flight_number)
     else:
-        flash('Please log in as staff to access this page.')
+        flash('Please log in as staff for access')
         return redirect(url_for('login'))
 
 
@@ -221,7 +221,7 @@ def add_airplane():
     if "user_id" in session:
         airline_name = get_staff_airline()
         if airline_name is None:
-            flash('You do not have permission to add airplanes.')
+            flash('Unauthorized to add airplanes.')
             return redirect(url_for('airline_staff_bp.flight_dashboard'))
 
         if request.method == 'POST':
@@ -258,7 +258,7 @@ def add_airplane():
         
         return render_template('add_airplane.html')
     else:
-        flash('Please log in as staff to access this page.')
+        flash('Please log in as staff for access')
         return redirect(url_for('login'))
 
     #-------------------worked upto here-----------------------------
