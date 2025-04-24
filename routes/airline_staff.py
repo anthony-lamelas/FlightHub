@@ -263,9 +263,6 @@ def add_airplane():
 
     return render_template('add_airplane.html')
 
-
-    #-------------------worked upto here-----------------------------
-
         # back to the dashboard
     return redirect("/staff/home")
 
