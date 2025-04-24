@@ -175,97 +175,98 @@ def create_flight():
         cursor.close()
         conn.close()
 
-       # ----------------------------- Have not tested yet-----------------
-@airline_staff_bp.route('/change_status/<string:flight_number>', methods=['GET', 'POST'])
-def change_flight_status(flight_number):
-    if "user_id" in session:
-        airline_name = get_staff_airline()
-        if airline_name is None:
-            flash('Unauthorized to access this page.')
-            return redirect(url_for('airline_staff_bp.flight_dashboard'))
+        # back to the dashboard
+        return redirect("/staff/home")
 
-        if request.method == 'POST':
-            new_status = request.form.get('flight_status')
+    # GET → render the form
+    return render_template('create_flight.html')
 
-            conn = get_db_connection()
-            cursor = conn.cursor()
 
-            try:
-                cursor.execute(
-                    """
-                    UPDATE flight
-                    SET flight_status = %s
-                    WHERE flight_number = %s
-                    AND airline_name = %s
-                    """,
-                    (new_status, flight_number, airline_name)
-                )
-                conn.commit()
-                flash('Flight status has been updated successfully.')
-            except Exception as e:
-                flash(f'Error updating flight status: {str(e)}')
-            finally:
-                cursor.close()
-                conn.close()
-
-            return redirect(url_for('airline_staff_bp.flight_dashboard'))
-        
-        return render_template('change_flight_status.html', flight_number=flight_number)
-    else:
+#--------------work from here (this works too but the drop menu doesnt show all options--------------
+@airline_staff_bp.route('/change_status', methods=['GET', 'POST'])
+def change_flight_status():
+    if "user_id" not in session:
         flash('Please log in as staff for access')
         return redirect(url_for('login'))
 
+    # 1. Open connection and cursor
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    # 2. Fetch all flight numbers from the database
+    cursor.execute("SELECT flight_number FROM flight")
+    flights = cursor.fetchall()
+
+    # Optional debug:
+    print("DEBUG: flights =", flights)
+
+    # 3. Handle POST (status update)
+    if request.method == 'POST':
+        new_status = request.form.get('flight_status')
+        flight_number = request.form.get('flight_number')
+        try:
+            cursor.execute(
+                """
+                UPDATE flight
+                SET flight_status = %s
+                WHERE flight_number = %s
+                """,
+                (new_status, flight_number)
+            )
+            conn.commit()
+            flash('Flight status has been updated successfully.')
+        except Exception as e:
+            flash(f'Error updating flight status: {e}')
+        finally:
+            cursor.close()
+            conn.close()
+
+        return redirect(url_for('airline_staff_bp.flight_dashboard'))
+
+
+    cursor.close()
+    conn.close()
+    return render_template(
+        'change_flight_status.html',
+        flights=flights
+    )
+#-------------------airline works -----------------------------
 
 @airline_staff_bp.route('/add_airplane', methods=['GET', 'POST'])
 def add_airplane():
-    if "user_id" in session:
-        airline_name = get_staff_airline()
-        if airline_name is None:
-            flash('Unauthorized to add airplanes.')
-            return redirect(url_for('airline_staff_bp.flight_dashboard'))
-
-        if request.method == 'POST':
-            airplane_id = request.form.get('airplane_id')
-            number_of_seats = request.form.get('number_of_seats')
-            manufacturing_company = request.form.get('manufacturing_company')
-
-    
-            print(f"Trying to add airplane: {airplane_id}, {number_of_seats}, {manufacturing_company}, {airline_name}")
-
-            conn = get_db_connection()
-            cursor = conn.cursor()
-
-            try:
-                cursor.execute(
-                    """
-                    INSERT INTO airplane (
-                        airplane_id, airline_name, number_of_seats, manufacturing_company
-                    ) VALUES (%s, %s, %s, %s)
-                    """,
-                    (airplane_id, airline_name, number_of_seats, manufacturing_company)
-                )
-                conn.commit() 
-                flash('New airplane added successfully.')
-                print("Airplane added successfully!")  
-
-                return redirect(url_for('airline_staff_bp.flight_dashboard'))
-            except Exception as e:
-                flash(f'Error adding airplane: {str(e)}') 
-                print(f"Error: {str(e)}")  
-            finally:
-                cursor.close()
-                conn.close() 
-
-        return render_template('add_airplane.html') 
-    else:
-        flash('Please log in as staff for access')
+    if "user_id" not in session:
         return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        airline_name          = request.form.get('airline_name')
+        airplane_id           = request.form.get('airplane_id')
+        number_of_seats       = request.form.get('number_of_seats')
+        manufacturing_company = request.form.get('manufacturing_company')
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(
+                """
+                INSERT INTO airplane (
+                    airplane_id, airline_name, number_of_seats, manufacturing_company
+                ) VALUES (%s, %s, %s, %s)
+                """,
+                (airplane_id, airline_name, number_of_seats, manufacturing_company)
+            )
+            conn.commit()
+            return redirect(url_for('airline_staff_bp.flight_dashboard'))
+        finally:
+            cursor.close()
+            conn.close()
+
+    return render_template('add_airplane.html')
 
 
     #-------------------worked upto here-----------------------------
 
         # back to the dashboard
-        return redirect("/staff/home")
+    return redirect("/staff/home")
 
     # GET → render the form
     return render_template('create_flight.html')
