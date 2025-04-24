@@ -182,7 +182,8 @@ def create_flight():
     return render_template('create_flight.html')
 
 
-#--------------work from here (this works too but the drop menu doesnt show all options--------------
+
+#--------------worked from here--------------
 @airline_staff_bp.route('/change_status', methods=['GET', 'POST'])
 def change_flight_status():
     if "user_id" not in session:
@@ -223,7 +224,7 @@ def change_flight_status():
 
         return redirect(url_for('airline_staff_bp.flight_dashboard'))
 
-
+    # 4. GET → render form with the `flights` list
     cursor.close()
     conn.close()
     return render_template(
