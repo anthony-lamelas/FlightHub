@@ -8,25 +8,16 @@
     <h2>Confirm Ticket Purchase</h2>
 
     <form method="POST" action="{{ url_for('customer_bp.purchase_ticket') }}">
-      <!-- These hidden fields come from the flight selection -->
-      <input
-        type="hidden"
-        name="flight_number"
-        value="{{ flight.flight_number }}"
-      />
+      <!-- Hidden fields passed from flight selection -->
+      <input type="hidden" name="flight_number" value="{{ flight_number }}" />
       <input
         type="hidden"
         name="departure_date_time"
-        value="{{ flight.departure_date_time }}"
+        value="{{ departure_date_time }}"
       />
 
-      <p><strong>Flight:</strong> {{ flight.flight_number }}</p>
-      <p>
-        <strong>From:</strong> {{ flight.departure_airport_code }} to {{
-        flight.arrival_airport_code }}
-      </p>
-      <p><strong>Departure:</strong> {{ flight.departure_date_time }}</p>
-      <p><strong>Base Price:</strong> ${{ flight.base_price }}</p>
+      <p><strong>Flight Number:</strong> {{ flight_number }}</p>
+      <p><strong>Departure Date & Time:</strong> {{ departure_date_time }}</p>
 
       <hr />
 

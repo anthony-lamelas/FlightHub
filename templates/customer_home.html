@@ -37,36 +37,40 @@
       method="POST"
       action="{{ url_for('customer_bp.customer_home') }}"
     >
-      <label
-        >From date:
+      <label>
+        From date:
         <input
           type="date"
           name="from_date"
           value="{{ request.form.get('from_date','') }}"
-      /></label>
-      <label
-        >To date:
+        />
+      </label>
+      <label>
+        To date:
         <input
           type="date"
           name="to_date"
           value="{{ request.form.get('to_date','') }}"
-      /></label>
-      <label
-        >Dep Airport:
+        />
+      </label>
+      <label>
+        Dep Airport:
         <input
           type="text"
           name="src_code"
           size="4"
           value="{{ request.form.get('src_code','') }}"
-      /></label>
-      <label
-        >Arr Airport:
+        />
+      </label>
+      <label>
+        Arr Airport:
         <input
           type="text"
           name="dest_code"
           size="4"
           value="{{ request.form.get('dest_code','') }}"
-      /></label>
+        />
+      </label>
 
       <button type="submit">Filter</button>
       <a href="{{ url_for('customer_bp.customer_home') }}">Reset</a>
@@ -85,6 +89,7 @@
             <th>Departure Date & Time</th>
             <th>Arrival Date & Time</th>
             <th>Status</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -96,6 +101,25 @@
             <td>{{ flight.departure_date_time }}</td>
             <td>{{ flight.arrival_date_time }}</td>
             <td>{{ flight.flight_status }}</td>
+            <td>
+              <form
+                method="POST"
+                action="{{ url_for('customer_bp.purchase_ticket_form') }}"
+                style="display: inline"
+              >
+                <input
+                  type="hidden"
+                  name="flight_number"
+                  value="{{ flight.flight_number }}"
+                />
+                <input
+                  type="hidden"
+                  name="departure_date_time"
+                  value="{{ flight.departure_date_time }}"
+                />
+                <button type="submit">Purchase</button>
+              </form>
+            </td>
           </tr>
           {% endfor %}
         </tbody>
@@ -117,13 +141,14 @@
     </form>
 
     {% if filter_type == 'past' %}
-    <h3>Past Flights</h3>
+    <h3>My Past Flights</h3>
     {% else %}
-    <h3>Upcoming Flights</h3>
+    <h3>My Upcoming Flights</h3>
     {% endif %} {% if purchased_flights %}
     <table>
       <thead>
         <tr>
+          <th>Ticket ID</th>
           <th>Flight Number</th>
           <th>Departure</th>
           <th>Arrival</th>
@@ -136,6 +161,7 @@
       <tbody>
         {% for flight in purchased_flights %}
         <tr>
+          <td>{{ flight.ticket_id }}</td>
           <td>{{ flight.flight_number }}</td>
           <td>{{ flight.departure_airport_code }}</td>
           <td>{{ flight.arrival_airport_code }}</td>
