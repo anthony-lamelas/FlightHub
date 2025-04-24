@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, session, redirect, request
+from flask import Blueprint, render_template, session, redirect, request, flash, url_for
 from db_connection import *
 
 airline_staff_bp = Blueprint(
@@ -226,11 +226,11 @@ def add_airplane():
 
         if request.method == 'POST':
             airplane_id = request.form.get('airplane_id')
-            num_of_seats = request.form.get('num_of_seats')
+            number_of_seats = request.form.get('number_of_seats')
             manufacturing_company = request.form.get('manufacturing_company')
-            model_number = request.form.get('model_number')
-            manufacturing_date = request.form.get('manufacturing_date')
-            age = request.form.get('age')
+
+    
+            print(f"Trying to add airplane: {airplane_id}, {number_of_seats}, {manufacturing_company}, {airline_name}")
 
             conn = get_db_connection()
             cursor = conn.cursor()
@@ -239,33 +239,34 @@ def add_airplane():
                 cursor.execute(
                     """
                     INSERT INTO airplane (
-                        airplane_id, num_of_seats, manufacturing_company, model_number, 
-                        manufacturing_date, age, airline_name
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s)
+                        airplane_id, airline_name, number_of_seats, manufacturing_company
+                    ) VALUES (%s, %s, %s, %s)
                     """,
-                    (airplane_id, num_of_seats, manufacturing_company, model_number, 
-                     manufacturing_date, age, airline_name)
+                    (airplane_id, airline_name, number_of_seats, manufacturing_company)
                 )
-                conn.commit()
+                conn.commit() 
                 flash('New airplane added successfully.')
+                print("Airplane added successfully!")  
+
+                return redirect(url_for('airline_staff_bp.flight_dashboard'))
             except Exception as e:
-                flash(f'Error adding airplane: {str(e)}')
+                flash(f'Error adding airplane: {str(e)}') 
+                print(f"Error: {str(e)}")  
             finally:
                 cursor.close()
-                conn.close()
+                conn.close() 
 
-            return redirect(url_for('airline_staff_bp.flight_dashboard'))
-        
-        return render_template('add_airplane.html')
+        return render_template('add_airplane.html') 
     else:
         flash('Please log in as staff for access')
         return redirect(url_for('login'))
 
-    #-------------------worked upto here-----------------------------
 
+    #-------------------worked upto here-----------------------------
 
         # back to the dashboard
         return redirect("/staff/home")
 
     # GET → render the form
     return render_template('create_flight.html')
+
