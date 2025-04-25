@@ -182,9 +182,8 @@ def create_flight():
     return render_template('create_flight.html')
 
 
-
 #--------------worked from here--------------
-@airline_staff_bp.route('/change_status', methods=['GET', 'POST'])
+@airline_staff_bp.route('/status', methods=['GET', 'POST'])
 def change_flight_status():
     if "user_id" not in session:
         flash('Please log in as staff for access')
@@ -194,8 +193,15 @@ def change_flight_status():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
+    airline_name = get_staff_airline()
+
     # 2. Fetch all flight numbers from the database
-    cursor.execute("SELECT flight_number FROM flight")
+    cursor.execute(
+                """SELECT flight_number \
+                FROM flight
+                WHERE airline_name = %s
+                   """, (airline_name,))
+    
     flights = cursor.fetchall()
 
     # Optional debug:
@@ -233,13 +239,13 @@ def change_flight_status():
     )
 #-------------------airline works -----------------------------
 
-@airline_staff_bp.route('/add_airplane', methods=['GET', 'POST'])
+@airline_staff_bp.route('/add-plane', methods=['GET', 'POST'])
 def add_airplane():
     if "user_id" not in session:
         return redirect(url_for('login'))
 
     if request.method == 'POST':
-        airline_name          = request.form.get('airline_name')
+        airline_name          = get_staff_airline()
         airplane_id           = request.form.get('airplane_id')
         number_of_seats       = request.form.get('number_of_seats')
         manufacturing_company = request.form.get('manufacturing_company')

@@ -22,6 +22,21 @@
     </a>
   </div>
 
+    <!-- Change Flight Status -->
+    <div class="action-bar">
+      <a href="/staff/status">
+        <button type="button">Change Flight Status</button>
+      </a>
+    </div>
+
+    <!-- Create Flight Button -->
+  <div class="action-bar">
+    <a href="/staff/add-plane">
+      <button type="button">Add Airplane</button>
+    </a>
+  </div>
+
+
   <!-- ───────── Search / Filter form ───────── -->
   <form class="inline" method="GET" action="{{ url_for('airline_staff_bp.flight_dashboard') }}">
     <label>From date: <input type="date" name="from_date" value="{{ request.args.get('from_date','') }}"></label>
