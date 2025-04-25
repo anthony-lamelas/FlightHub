@@ -72,14 +72,14 @@
         />
       </label>
 
-      <button type="submit">Filter</button>
+      <button type="submit">Search Flights</button>
       <a href="{{ url_for('customer_bp.customer_home') }}">Reset</a>
     </form>
 
-    <!-- ───────── Upcoming Flights ───────── -->
+    <!-- ───────── Search Results ───────── -->
+    {% if upcoming_flights %}
     <div>
-      <h2>Upcoming Flights</h2>
-      {% if upcoming_flights %}
+      <h2>Available Tickets</h2>
       <table>
         <thead>
           <tr>
@@ -124,10 +124,15 @@
           {% endfor %}
         </tbody>
       </table>
-      {% else %}
-      <p>No upcoming flights found.</p>
-      {% endif %}
     </div>
+    {% elif request.method == "POST" and 'filter_type' not in request.form %}
+    <p>
+      <strong
+        >No flights match your search criteria. Please try different
+        filters.</strong
+      >
+    </p>
+    {% endif %}
 
     <!-- ───────── Purchased Flights Section ───────── -->
     <h2>My Booked Flights</h2>
@@ -154,6 +159,7 @@
           <th>Arrival</th>
           <th>Departure Date & Time</th>
           <th>Arrival Date & Time</th>
+          <th>Sold Price ($)</th>
           <th>Status</th>
           <th>Action</th>
         </tr>
@@ -167,6 +173,7 @@
           <td>{{ flight.arrival_airport_code }}</td>
           <td>{{ flight.departure_date_time }}</td>
           <td>{{ flight.arrival_date_time }}</td>
+          <td>{{ flight.sold_price | round(2) }}</td>
           <td>{{ flight.flight_status }}</td>
           <td>
             {% if flight.departure_date_time > current_time_plus_24 %}

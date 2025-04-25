@@ -17,10 +17,13 @@ def customer_home():
 
     # Handle flight filtering (optional)
     query = """
-        SELECT flight_number, departure_airport_code, arrival_airport_code,
-               departure_date_time, arrival_date_time, flight_status
-        FROM flight
-        WHERE departure_date_time > NOW()
+        SELECT DISTINCT f.flight_number, f.departure_airport_code, f.arrival_airport_code,
+                        f.departure_date_time, f.arrival_date_time, f.flight_status
+        FROM Flight f
+        JOIN Ticket t ON f.flight_number = t.flight_number
+                    AND f.departure_date_time = t.departure_date_time
+                    AND f.airline_name = t.airline_name
+        WHERE t.is_purchased = FALSE AND f.departure_date_time > NOW()
     """
     filters = []
     values = []
@@ -32,22 +35,22 @@ def customer_home():
         dest_code = request.form.get("dest_code")
 
         if from_date:
-            filters.append("DATE(departure_date_time) >= %s")
+            filters.append("DATE(f.departure_date_time) >= %s")
             values.append(from_date)
         if to_date:
-            filters.append("DATE(departure_date_time) <= %s")
+            filters.append("DATE(f.departure_date_time) <= %s")
             values.append(to_date)
         if src_code:
-            filters.append("departure_airport_code = %s")
+            filters.append("f.departure_airport_code = %s")
             values.append(src_code.upper())
         if dest_code:
-            filters.append("arrival_airport_code = %s")
+            filters.append("f.arrival_airport_code = %s")
             values.append(dest_code.upper())
 
     if filters:
         query += " AND " + " AND ".join(filters)
 
-    query += " ORDER BY departure_date_time"
+    query += " ORDER BY f.departure_date_time"
     cursor.execute(query, values)
     upcoming_flights = cursor.fetchall()
 
@@ -56,28 +59,27 @@ def customer_home():
     if filter_type == "past":
         purchase_query = """
             SELECT p.ticket_id, f.flight_number, f.departure_airport_code, f.arrival_airport_code,
-                f.departure_date_time, f.arrival_date_time, f.flight_status
+                   f.departure_date_time, f.arrival_date_time, f.flight_status, t.sold_price
             FROM Purchase p
             JOIN Ticket t ON p.ticket_id = t.ticket_id
             JOIN Flight f ON t.flight_number = f.flight_number
-                        AND t.departure_date_time = f.departure_date_time
-                        AND t.airline_name = f.airline_name
+                         AND t.departure_date_time = f.departure_date_time
+                         AND t.airline_name = f.airline_name
             WHERE p.email = %s AND f.departure_date_time < NOW()
             ORDER BY f.departure_date_time DESC
         """
     else:
         purchase_query = """
             SELECT p.ticket_id, f.flight_number, f.departure_airport_code, f.arrival_airport_code,
-                f.departure_date_time, f.arrival_date_time, f.flight_status
+                   f.departure_date_time, f.arrival_date_time, f.flight_status, t.sold_price
             FROM Purchase p
             JOIN Ticket t ON p.ticket_id = t.ticket_id
             JOIN Flight f ON t.flight_number = f.flight_number
-                        AND t.departure_date_time = f.departure_date_time
-                        AND t.airline_name = f.airline_name
+                         AND t.departure_date_time = f.departure_date_time
+                         AND t.airline_name = f.airline_name
             WHERE p.email = %s AND f.departure_date_time >= NOW()
             ORDER BY f.departure_date_time
         """
-
 
     cursor.execute(purchase_query, (user_email,))
     purchased_flights = cursor.fetchall()
@@ -119,25 +121,60 @@ def purchase_ticket():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Step 1: Get an available ticket for this flight
+    # Step 1: Get airplane_id and capacity for the flight
     cursor.execute("""
-        SELECT ticket_id, airline_name, flight_number, departure_date_time, sold_price
-        FROM Ticket
-        WHERE flight_number = %s AND departure_date_time = %s
-        LIMIT 1
+        SELECT f.airline_name, f.airplane_id, f.base_price, a.number_of_seats
+        FROM Flight f
+        JOIN Airplane a ON f.airplane_id = a.airplane_id
+        WHERE f.flight_number = %s AND f.departure_date_time = %s
     """, (flight_number, departure_date_time))
+    flight_data = cursor.fetchone()
+
+    if not flight_data:
+        flash("Flight not found.")
+        return redirect("/customer_home")
+
+    airline_name, airplane_id, base_price, total_seats = flight_data
+
+    # Step 2: Count how many seats are booked (is_purchased = TRUE)
+    cursor.execute("""
+        SELECT COUNT(*) FROM Ticket
+        WHERE flight_number = %s AND departure_date_time = %s AND airline_name = %s AND is_purchased = TRUE
+    """, (flight_number, departure_date_time, airline_name))
+    booked_seats = cursor.fetchone()[0]
+
+    if booked_seats >= total_seats:
+        flash("This flight is fully booked.")
+        return redirect("/customer_home")
+
+    # Step 3: Find an available ticket (not purchased)
+    cursor.execute("""
+        SELECT ticket_id, sold_price FROM Ticket
+        WHERE flight_number = %s AND departure_date_time = %s AND airline_name = %s AND is_purchased = FALSE
+        LIMIT 1
+    """, (flight_number, departure_date_time, airline_name))
     ticket = cursor.fetchone()
 
     if not ticket:
         flash("No available tickets for this flight.")
         return redirect("/customer_home")
 
-    ticket_id, airline_name, flight_number, departure_date_time, sold_price = ticket
+    ticket_id, sold_price = ticket
 
-    # Step 2: Remove the ticket from availability
-    cursor.execute("DELETE FROM Ticket WHERE ticket_id = %s", (ticket_id,))
+    # Step 4: Update price if demand > 60%
+    if booked_seats >= 0.6 * total_seats:
+        sold_price = round(base_price * 1.2, 2)
+    else:
+        sold_price = base_price
 
-    # Step 3: Insert into Purchase
+    # Step 5: Update ticket as purchased and price
+    cursor.execute("""
+        UPDATE Ticket
+        SET is_purchased = TRUE, sold_price = %s
+        WHERE ticket_id = %s
+    """, (sold_price, ticket_id))
+
+    # Step 6: Insert into Purchase table
     cursor.execute("""
         INSERT INTO Purchase (
             email, ticket_id, first_name, last_name, date_of_birth,
@@ -154,6 +191,7 @@ def purchase_ticket():
 
     flash("Ticket purchased successfully!")
     return redirect("/customer_home")
+
 
 
 @customer_bp.route("/purchase_ticket_form", methods=["POST"])
@@ -180,20 +218,19 @@ def cancel_ticket():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # Step 1: Get flight info for the ticket
+    # Step 1: Get flight departure time for the ticket
     cursor.execute("""
-        SELECT t.airline_name, t.flight_number, t.departure_date_time, t.sold_price, f.departure_date_time
+        SELECT f.departure_date_time
         FROM Purchase p
         JOIN Ticket t ON p.ticket_id = t.ticket_id
         JOIN Flight f ON t.flight_number = f.flight_number
-                    AND t.departure_date_time = f.departure_date_time
-                    AND t.airline_name = f.airline_name
+                     AND t.departure_date_time = f.departure_date_time
+                     AND t.airline_name = f.airline_name
         WHERE p.email = %s AND p.ticket_id = %s
     """, (user_email, ticket_id))
 
     result = cursor.fetchone()
 
-    # If not result
     if not result:
         flash("Ticket not found or you don't own this ticket.")
         cursor.close()
@@ -203,25 +240,21 @@ def cancel_ticket():
     departure_time = result["departure_date_time"]
     curr_time_plus_24 = datetime.now() + timedelta(hours=24)
 
-    # Step 2: Check timing
+    # Step 2: Check if cancellation is allowed
     if departure_time <= curr_time_plus_24:
         flash("You can only cancel tickets for flights more than 24 hours in the future.")
     else:
-        # Step 3: Cancel the ticket (delete from Purchase, re-add to Ticket if it doesn't already exist)
-        cursor.execute("DELETE FROM Purchase WHERE ticket_id = %s AND email = %s", (ticket_id, user_email))
+        # Step 3: Cancel the ticket (mark Ticket as not purchased, delete from Purchase)
+        cursor.execute("""
+            UPDATE Ticket
+            SET is_purchased = FALSE
+            WHERE ticket_id = %s
+        """, (ticket_id,))
 
-        # Try to reinsert only if it doesn’t exist in Ticket
-        cursor.execute("SELECT 1 FROM Ticket WHERE ticket_id = %s", (ticket_id,))
-        exists = cursor.fetchone()
-
-        if not exists:
-            cursor.execute("""
-                INSERT INTO Ticket (ticket_id, airline_name, flight_number, departure_date_time, sold_price)
-                VALUES (%s, %s, %s, %s, %s)
-            """, (
-                ticket_id, result["airline_name"], result["flight_number"],
-                result["departure_date_time"], result["sold_price"]
-            ))
+        cursor.execute("""
+            DELETE FROM Purchase
+            WHERE ticket_id = %s AND email = %s
+        """, (ticket_id, user_email))
 
         conn.commit()
         flash("Ticket canceled successfully.")
