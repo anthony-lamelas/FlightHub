@@ -9,14 +9,14 @@ airline_staff_bp = Blueprint(
 
 @airline_staff_bp.route("/airline_staff_home")
 def airline_staff_home():
-    if "user_id" not in session:
+    if "user_id" not in session or session.get("user_type") != "staff":
         return redirect("/login")
     return render_template("airline_staff_home.html")
 
 
 def get_staff_airline():
     username = session.get("user_id")
-    if not username:
+    if not username or session.get("user_type") != "staff":
         return None
 
     conn = get_db_connection()
@@ -34,7 +34,7 @@ def get_staff_airline():
 @airline_staff_bp.route('/home')
 def flight_dashboard():
     # require login
-    if "user_id" not in session:
+    if "user_id" not in session or session.get("user_type") != "staff":
         return redirect("/login")
 
     airline_name = get_staff_airline()
@@ -134,7 +134,7 @@ def view_flight_customers():
 @airline_staff_bp.route('/create', methods=['GET', 'POST'])
 def create_flight():
     # require login
-    if "user_id" not in session:
+    if "user_id" not in session or session.get("user_type") != "staff":
         return redirect("/login")
     airline_name = get_staff_airline()
     if airline_name is None:
@@ -185,7 +185,7 @@ def create_flight():
 #--------------worked from here--------------
 @airline_staff_bp.route('/status', methods=['GET', 'POST'])
 def change_flight_status():
-    if "user_id" not in session:
+    if "user_id" not in session or session.get("user_type") != "staff":
         flash('Please log in as staff for access')
         return redirect(url_for('login'))
 
@@ -241,7 +241,7 @@ def change_flight_status():
 
 @airline_staff_bp.route('/add-plane', methods=['GET', 'POST'])
 def add_airplane():
-    if "user_id" not in session:
+    if "user_id" not in session or session.get("user_type") != "staff":
         return redirect(url_for('login'))
 
     if request.method == 'POST':
@@ -275,3 +275,81 @@ def add_airplane():
     # GET → render the form
     return render_template('create_flight.html')
 
+
+#----------------------------------------------#
+
+# Add Airport
+@airline_staff_bp.route('/add-airport', methods=['GET', 'POST'])
+def add_airport():
+    if "user_id" not in session or session.get("user_type") != "staff":
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        airport_code          = request.form.get('airport_code')
+        airport_name          = request.form.get('airport_name')
+        city                  = request.form.get('city')
+        country               = request.form.get('country')
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(
+                """
+                INSERT INTO airport (
+                    airport_code, airport_name, city, country
+                ) VALUES (%s, %s, %s, %s)
+                """,
+                (airport_code, airport_name, city, country)
+            )
+            conn.commit()
+            return redirect(url_for('airline_staff_bp.flight_dashboard'))
+        finally:
+            cursor.close()
+            conn.close()
+
+    return render_template('add_airport.html')
+
+
+
+# View flight ratings
+@airline_staff_bp.route('/flight-ratings', methods=['GET', 'POST'])
+def view_ratings():
+    if "user_id" not in session or session.get("user_type") != "staff":
+        return redirect(url_for('auth.login'))
+
+    airline_name = get_staff_airline()
+    ratings_data = []
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        query = """
+                SELECT f.flight_number,
+                    AVG(r.rating) AS avg_rating,
+                    GROUP_CONCAT(r.comments SEPARATOR ' || ') AS comments
+                FROM review r
+                JOIN ticket t ON r.ticket_id = t.ticket_id
+                JOIN flight f ON t.airline_name = f.airline_name
+                AND t.flight_number = f.flight_number
+                AND t.departure_date_time = f.departure_date_time
+                WHERE f.airline_name = %s
+            """
+        cursor.execute(query, (airline_name,))
+        ratings_data = cursor.fetchall()
+
+    finally:
+        cursor.close()
+        conn.close()
+
+    return render_template('view_ratings.html', ratings=ratings_data)
+
+
+
+
+    
+
+
+
+
+# View reports (tickets sold in bar chart / table)
