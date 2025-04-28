@@ -15,6 +15,16 @@ def customer_login():
 def staff_login():
     return render_template("staff_login.html")
 
+@auth_bp.route('/logout')
+def logout():
+    user_type = session.get("user_type")
+    session.clear()
+
+    if user_type == "staff":
+        return redirect('/login/staff')  
+    else:
+        return redirect('login/customer')
+
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
     try:        

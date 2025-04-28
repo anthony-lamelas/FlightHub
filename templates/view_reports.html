@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <div class="action-bar">
+    <a href="/staff/home">
+      <button type="button">Home</button>
+    </a>
+  </div>
+
+  <meta charset="UTF-8">
+  <title>Ticket Sales Report</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+      background-color: #f0f8ff;
+    }
+    table {
+      width: 80%;
+      border-collapse: collapse;
+      margin-top: 2rem;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 0.8rem;
+      text-align: center;
+    }
+    th {
+      background-color: #e0e0e0;
+    }
+    h1, h2 {
+      color: #333;
+    }
+    form {
+      margin-bottom: 2rem;
+    }
+    input[type="date"] {
+      margin-right: 1rem;
+      padding: 0.4rem;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>FlightHub Ticket Sales Report</h1>
+
+  <!-- Date Range Filter Form -->
+  <form method="GET">
+    <label>From Date:
+      <input type="date" name="from_date" value="{{ from_date }}">
+    </label>
+    <label>To Date:
+      <input type="date" name="to_date" value="{{ to_date }}">
+    </label>
+    <button type="submit">Filter</button>
+  </form>
+
+  {% if report_data %}
+    <h2>Tickets Sold by Month</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Year</th>
+          <th>Month</th>
+          <th>Tickets Sold</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in report_data %}
+          <tr>
+            <td>{{ row.year }}</td>
+            <td>{{ row.month_name }}</td>
+            <td>{{ row.tickets_sold }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No ticket sales found for the selected range.</p>
+  {% endif %}
+
+  
+</body>
+</html>
+
+

@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, session, redirect, request, flash, url_for
 from db_connection import *
+from datetime import datetime, timedelta
 
 airline_staff_bp = Blueprint(
     'airline_staff_bp', __name__,
@@ -96,7 +97,7 @@ def flight_dashboard():
     cursor.execute(flight_sql, tuple(parameters))
     flights = cursor.fetchall()
 
-    # optional: load passengers for a selected flight
+    # load passengers for a selected flight
     sel_flight   = request.args.get("flight_number")
     sel_dep_time = request.args.get("dep_time")
     customers    = None
@@ -345,11 +346,52 @@ def view_ratings():
     return render_template('view_ratings.html', ratings=ratings_data)
 
 
-
-
-    
-
-
-
-
 # View reports (tickets sold in bar chart / table)
+# 7. View reports: Total amounts of ticket sold based on range of dates/last year/last month etc. Month
+# wise tickets sold in a bar chart/table
+@airline_staff_bp.route('/view-reports', methods=['GET','POST'])
+def view_reports():
+    if "user_id" not in session or session.get("user_type") != "staff":
+        return redirect(url_for('auth.login'))
+    
+    airline_name = get_staff_airline()
+    from_date = request.args.get("from_date")
+    to_date   = request.args.get("to_date")
+
+    # default to last year if no dates are provided
+    if not from_date or not to_date:
+        today = datetime.today()
+        from_date = (today.replace(year=today.year-1)).strftime('%Y-%m-%d')
+        to_date = today.strftime('%Y-%m-%d')
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        query = """
+                SELECT YEAR(p.purchase_date_time) AS year,
+                    MONTH(p.purchase_date_time) AS month,
+                    COUNT(*) AS tickets_sold
+                    FROM ticket t JOIN purchase p ON t.ticket_id = p.ticket_id
+                    WHERE t.airline_name = %s
+                    AND p.purchase_date_time BETWEEN %s AND %s
+                    GROUP BY YEAR(p.purchase_date_time), MONTH(p.purchase_date_time)
+                    ORDER BY year, month
+                """
+        cursor.execute(query,(airline_name,from_date,to_date))
+        report_data = cursor.fetchall()
+        for row in report_data:
+            month_number = row['month']
+            month_name = datetime(1900, month_number, 1).strftime('%B')  # January, February, etc.
+            row['month_name'] = month_name
+        
+    finally:
+        cursor.close()
+        conn.close()
+
+    return render_template('view_reports.html', report_data=report_data, from_date=from_date, to_date=to_date)
+
+
+
+
+# 8. Logout: The session is destroyed and a “goodbye” page or the login page is displayed. how do I do the logout
