@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Review Flight</title>
+  </head>
+  <body>
+    <h2>Leave a Review</h2>
+
+    <form method="POST" action="{{ url_for('customer_bp.submit_review') }}">
+      <input type="hidden" name="ticket_id" value="{{ ticket_id }}" />
+
+      <label for="rating">Rating (1-5):</label><br />
+      <input type="number" name="rating" min="1" max="5" required /><br /><br />
+
+      <label for="comments">Comment:</label><br />
+      <textarea name="comments" rows="4" cols="50" required></textarea
+      ><br /><br />
+
+      <button type="submit">Submit Review</button>
+    </form>
+  </body>
+</html>

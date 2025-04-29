@@ -262,3 +262,47 @@ def cancel_ticket():
     cursor.close()
     conn.close()
     return redirect("/customer_home")
+
+
+@customer_bp.route("/review_ticket_form", methods=["POST"])
+def review_ticket_form():
+    if "user_id" not in session or session.get("user_type") != "customer":
+        return redirect("/login")
+
+    ticket_id = request.form.get("ticket_id")
+    return render_template("review_ticket.html", ticket_id=ticket_id)
+
+
+@customer_bp.route("/submit_review", methods=["POST"])
+def submit_review():
+    if "user_id" not in session or session.get("user_type") != "customer":
+        return redirect("/login")
+
+    user_email = session["user_id"]
+    ticket_id = request.form.get("ticket_id")
+    rating = request.form.get("rating")
+    comments = request.form.get("comments")
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Check if review already exists for this ticket to prevent duplicates
+    cursor.execute("SELECT * FROM Review WHERE email = %s AND ticket_id = %s", (user_email, ticket_id))
+    if cursor.fetchone():
+        flash("You have already reviewed this flight.")
+        cursor.close()
+        conn.close()
+        return redirect("/customer_home")
+
+    cursor.execute("""
+        INSERT INTO Review (email, ticket_id, comments, rating)
+        VALUES (%s, %s, %s, %s)
+    """, (user_email, ticket_id, comments, rating))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    flash("Thank you for your feedback!")
+    return redirect("/customer_home")
+

@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>My Flights</title>
+
     <style>
       table {
         border-collapse: collapse;
@@ -28,8 +29,24 @@
       }
     </style>
   </head>
+
   <body>
-    <h1>My Flights</h1>
+    <div
+      style="display: flex; justify-content: space-between; align-items: center"
+    >
+      <h1 style="margin: 0">My Flights</h1>
+      <a
+        href="{{ url_for('auth.logout') }}"
+        style="
+          padding: 6px 12px;
+          background-color: rgb(170, 23, 23);
+          color: white;
+          text-decoration: none;
+          border-radius: 4px;
+        "
+        >Logout</a
+      >
+    </div>
 
     <!-- ───────── Search Form ───────── -->
     <form
@@ -37,24 +54,24 @@
       method="POST"
       action="{{ url_for('customer_bp.customer_home') }}"
     >
-      <label>
-        From date:
+      <label
+        >From date:
         <input
           type="date"
           name="from_date"
           value="{{ request.form.get('from_date','') }}"
         />
       </label>
-      <label>
-        To date:
+      <label
+        >To date:
         <input
           type="date"
           name="to_date"
           value="{{ request.form.get('to_date','') }}"
         />
       </label>
-      <label>
-        Dep Airport:
+      <label
+        >Dep Airport:
         <input
           type="text"
           name="src_code"
@@ -62,8 +79,8 @@
           value="{{ request.form.get('src_code','') }}"
         />
       </label>
-      <label>
-        Arr Airport:
+      <label
+        >Arr Airport:
         <input
           type="text"
           name="dest_code"
@@ -176,7 +193,21 @@
           <td>{{ flight.sold_price | round(2) }}</td>
           <td>{{ flight.flight_status }}</td>
           <td>
-            {% if flight.departure_date_time > current_time_plus_24 %}
+            {% if filter_type == 'past' %}
+            <form
+              action="{{ url_for('customer_bp.review_ticket_form') }}"
+              method="POST"
+              style="display: inline"
+            >
+              <input
+                type="hidden"
+                name="ticket_id"
+                value="{{ flight.ticket_id }}"
+              />
+              <button type="submit">Review Flight</button>
+            </form>
+            {% else %} {% if flight.departure_date_time > current_time_plus_24
+            %}
             <form
               action="{{ url_for('customer_bp.cancel_ticket') }}"
               method="POST"
@@ -191,7 +222,7 @@
             </form>
             {% else %}
             <em>Cannot cancel</em>
-            {% endif %}
+            {% endif %} {% endif %}
           </td>
         </tr>
         {% endfor %}
@@ -200,5 +231,14 @@
     {% else %}
     <p>No {{ filter_type }} flights found.</p>
     {% endif %}
+
+    <!-- Flash Message Script -->
+    {% with messages = get_flashed_messages() %} {% if messages %}
+    <script>
+      {% for message in messages %}
+        alert("{{ message }}");
+      {% endfor %}
+    </script>
+    {% endif %} {% endwith %}
   </body>
 </html>
