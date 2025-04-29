@@ -1,61 +1,91 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>Create Flight – {{ airline_name }}</title>
-  <style>
-    form { max-width: 500px; margin: 2rem auto; }
-    label { display: block; margin-bottom: .5rem; }
-    input, select { width: 100%; padding: .4rem; margin-bottom: 1rem; }
-    button { padding: .6rem 1.2rem; }
-  </style>
-</head>
-<body>
-  <h1>Create Flight – {{ airline_name }}</h1>
-  <form method="POST" action="/staff/create">
-    <label>Airplane ID
-      <input type="text" name="airplane_id" required>
-    </label>
-    <label>Flight Number
-      <input type="text" name="flight_number" required>
-    </label>
-    <label>Airport Code
-      <input type="text" name="airport_code" maxlength="10" required>
-    </label>
-    <label>Departure Airport Code
-      <input type="text" name="departure_airport_code" maxlength="4" required>
-    </label>
-    <label>Arrival Airport Code
-      <input type="text" name="arrival_airport_code" maxlength="4" required>
-    </label>
-    <label>Departure Date &amp; Time
-      <input type="datetime-local" name="departure_date_time" required>
-    </label>
-    <label>Arrival Date &amp; Time
-      <input type="datetime-local" name="arrival_date_time" required>
-    </label>
-    <label>Base Price
-      <input type="number" step="0.01" name="base_price" required>
-    </label>
-    <label>Airplane Number
-      <input type="text" name="airplane_number" required>
-    </label>
-    <label>Flight Status
-      <select name="flight_status" required>
-        <option>On Time</option>
-        <option>Delayed</option>
-        <option>Cancelled</option>
-      </select>
-    </label>
-    <button type="submit">Create Flight</button>
-    <a href="/staff/home">Cancel</a>
-  </form>
+  <head>
+    <meta charset="utf-8" />
+    <title>Create Flight – {{ airline_name }}</title>
+    <style>
+      body {
+        background-color: honeydew;
+      }
+      form {
+        max-width: 500px;
+        margin: 2rem auto;
+      }
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+      input,
+      select {
+        width: 100%;
+        padding: 0.4rem;
+        margin-bottom: 1rem;
+      }
+      button {
+        padding: 0.6rem 1.2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Create Flight – {{ airline_name }}</h1>
+    <form method="POST" action="/staff/create">
+      <label
+        >Airplane ID
+        <input type="text" name="airplane_id" required />
+      </label>
+      <label
+        >Flight Number
+        <input type="text" name="flight_number" required />
+      </label>
+      <label
+        >Airport Code
+        <input type="text" name="airport_code" maxlength="10" required />
+      </label>
+      <label
+        >Departure Airport Code
+        <input
+          type="text"
+          name="departure_airport_code"
+          maxlength="4"
+          required
+        />
+      </label>
+      <label
+        >Arrival Airport Code
+        <input type="text" name="arrival_airport_code" maxlength="4" required />
+      </label>
+      <label
+        >Departure Date &amp; Time
+        <input type="datetime-local" name="departure_date_time" required />
+      </label>
+      <label
+        >Arrival Date &amp; Time
+        <input type="datetime-local" name="arrival_date_time" required />
+      </label>
+      <label
+        >Base Price
+        <input type="number" step="0.01" name="base_price" required />
+      </label>
+      <label
+        >Airplane Number
+        <input type="text" name="airplane_number" required />
+      </label>
+      <label
+        >Flight Status
+        <select name="flight_status" required>
+          <option>On Time</option>
+          <option>Delayed</option>
+          <option>Cancelled</option>
+        </select>
+      </label>
+      <button type="submit">Create Flight</button>
+      <a href="/staff/home">Cancel</a>
+    </form>
 
-  <div class="action-bar">
-    <a href="/staff/home">
-      <button type="button">Home</button>
-    </a>
-  </div>
-
-</body>
+    <div class="action-bar">
+      <a href="/staff/home">
+        <button type="button">Home</button>
+      </a>
+    </div>
+  </body>
 </html>

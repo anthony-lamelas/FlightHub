@@ -1,102 +1,102 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Homepage</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Homepage</title>
 
-  <style>
-    body {
-      background-color: aqua;
-      font-family: sans-serif;
-      padding: 2rem;
-    }
-    form {
-      margin-bottom: 2rem;
-    }
-    button {
-      margin: 0.5rem;
-      padding: 0.6rem 1.2rem;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-    h1 {
-      margin-bottom: 2rem;
-    }
-  </style>
-</head>
+    <style>
+      body {
+        background-color: honeydew;
+        font-family: sans-serif;
+        padding: 2rem;
+      }
+      form {
+        margin-bottom: 2rem;
+      }
+      button {
+        margin: 0.5rem;
+        padding: 0.6rem 1.2rem;
+        font-size: 1rem;
+        cursor: pointer;
+      }
+      h1 {
+        margin-bottom: 2rem;
+      }
+    </style>
+  </head>
 
-<body>
-  <h1>Welcome to FlightHub</h1>
+  <body>
+    <h1>Welcome to FlightHub</h1>
 
-  <!-- Flight Search Form -->
-  <form method="POST" action="{{ url_for('public_bp.search_flights') }}">
-    <label for="source">From:</label>
-    <input type="text" name="source" placeholder="e.g. JFK" required />
+    <!-- Flight Search Form -->
+    <form method="POST" action="{{ url_for('public_bp.search_flights') }}">
+      <label for="source">From:</label>
+      <input type="text" name="source" placeholder="e.g. JFK" required />
 
-    <label for="destination">To:</label>
-    <input type="text" name="destination" placeholder="e.g. LAX" required />
+      <label for="destination">To:</label>
+      <input type="text" name="destination" placeholder="e.g. LAX" required />
 
-    <label for="departure_date">Departure Date:</label>
-    <input type="date" name="departure_date" required />
+      <label for="departure_date">Departure Date:</label>
+      <input type="date" name="departure_date" required />
 
-    <label for="return_date">Return Date (optional):</label>
-    <input type="date" name="return_date" />
+      <label for="return_date">Return Date (optional):</label>
+      <input type="date" name="return_date" />
 
-    <button type="submit">Search Flights</button>
-  </form>
+      <button type="submit">Search Flights</button>
+    </form>
 
-  <!-- Departing Flights Section -->
-  {% if departing_flights is defined %}
+    <!-- Departing Flights Section -->
+    {% if departing_flights is defined %}
     <h2>Departing Flights</h2>
     {% if departing_flights %}
-      <ul>
-        {% for flight in departing_flights %}
-          <li>
-            <strong>Flight {{ flight.flight_number }}</strong><br />
-            {{ flight.departure_airport_code }} → {{ flight.arrival_airport_code }}<br />
-            Departure: {{ flight.departure_date_time }}<br />
-            Arrival: {{ flight.arrival_date_time }}<br />
-            Base Price: ${{ flight.base_price }}
-          </li>
-        {% endfor %}
-      </ul>
+    <ul>
+      {% for flight in departing_flights %}
+      <li>
+        <strong>Flight {{ flight.flight_number }}</strong><br />
+        {{ flight.departure_airport_code }} → {{ flight.arrival_airport_code
+        }}<br />
+        Departure: {{ flight.departure_date_time }}<br />
+        Arrival: {{ flight.arrival_date_time }}<br />
+        Base Price: ${{ flight.base_price }}
+      </li>
+      {% endfor %}
+    </ul>
     {% else %}
-      <p>No departing flights found.</p>
-    {% endif %}
-  {% endif %}
+    <p>No departing flights found.</p>
+    {% endif %} {% endif %}
 
-  <!-- Return Flights Section -->
-  {% if return_flights is defined %}
+    <!-- Return Flights Section -->
+    {% if return_flights is defined %}
     <h2>Return Flights</h2>
     {% if return_flights %}
-      <ul>
-        {% for flight in return_flights %}
-          <li>
-            <strong>Flight {{ flight.flight_number }}</strong><br />
-            {{ flight.departure_airport_code }} → {{ flight.arrival_airport_code }}<br />
-            Departure: {{ flight.departure_date_time }}<br />
-            Arrival: {{ flight.arrival_date_time }}<br />
-            Base Price: ${{ flight.base_price }}
-          </li>
-        {% endfor %}
-      </ul>
+    <ul>
+      {% for flight in return_flights %}
+      <li>
+        <strong>Flight {{ flight.flight_number }}</strong><br />
+        {{ flight.departure_airport_code }} → {{ flight.arrival_airport_code
+        }}<br />
+        Departure: {{ flight.departure_date_time }}<br />
+        Arrival: {{ flight.arrival_date_time }}<br />
+        Base Price: ${{ flight.base_price }}
+      </li>
+      {% endfor %}
+    </ul>
     {% else %}
-      <p>No return flights found.</p>
-    {% endif %}
-  {% endif %}
+    <p>No return flights found.</p>
+    {% endif %} {% endif %}
 
-  <!-- Navigation Buttons -->
-  <div style="margin-top: 2rem;">
-    <a href="{{ url_for('auth.register') }}">
-      <button type="button">Register</button>
-    </a>
-    <a href="/login/customer">
-      <button type="button">Customer Login</button>
-    </a>
-    <a href="/login/staff">
-      <button type="button">Staff Login</button>
-    </a>
-  </div>
-</body>
+    <!-- Navigation Buttons -->
+    <div style="margin-top: 2rem">
+      <a href="{{ url_for('auth.register') }}">
+        <button type="button">Register</button>
+      </a>
+      <a href="/login/customer">
+        <button type="button">Customer Login</button>
+      </a>
+      <a href="/login/staff">
+        <button type="button">Staff Login</button>
+      </a>
+    </div>
+  </body>
 </html>

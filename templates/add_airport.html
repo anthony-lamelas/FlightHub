@@ -1,65 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Add Airplane</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
-  <h1>Add Airplane</h1>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Add Airplane</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+    <style>
+      body {
+        background-color: honeydew;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Add Airplane</h1>
 
-  <form method="post" action="{{ url_for('airline_staff_bp.add_airport') }}">
-    <div>
-      <label for="airplane_id">Airport Code:</label>
-      <input 
-        type="text" 
-        id="airport_code" 
-        name="airport_code" 
-        required 
-        placeholder="Unique airport identifier">
-    </div>
-
-    <div>
-      <label for="airport_name">Airport Name:</label>
-      <input 
-        type="text" 
-        id="airport_name" 
-        name="airport_name" 
-        required 
-        placeholder="e.g. Miami International Airport">
-    </div>
-
-    <div>
-      <label for="city">City:</label>
-      <input 
-        type="text" 
-        id="city" 
-        name="city" 
-        required 
-        placeholder="e.g. Chicago">
-    </div>
-
-    <div>
-        <label for="Country">Country:</label>
-        <input 
-          type="text" 
-          id="country" 
-          name="country" 
-          required 
-          placeholder="e.g. Canada">
+    <form method="post" action="{{ url_for('airline_staff_bp.add_airport') }}">
+      <div>
+        <label for="airplane_id">Airport Code:</label>
+        <input
+          type="text"
+          id="airport_code"
+          name="airport_code"
+          required
+          placeholder="Unique airport identifier"
+        />
       </div>
 
-    <div>
-      <button type="submit">Add Airport</button>
-      <a href="{{ url_for('airline_staff_bp.flight_dashboard') }}">Cancel</a>
+      <div>
+        <label for="airport_name">Airport Name:</label>
+        <input
+          type="text"
+          id="airport_name"
+          name="airport_name"
+          required
+          placeholder="e.g. Miami International Airport"
+        />
+      </div>
+
+      <div>
+        <label for="city">City:</label>
+        <input
+          type="text"
+          id="city"
+          name="city"
+          required
+          placeholder="e.g. Chicago"
+        />
+      </div>
+
+      <div>
+        <label for="Country">Country:</label>
+        <input
+          type="text"
+          id="country"
+          name="country"
+          required
+          placeholder="e.g. Canada"
+        />
+      </div>
+
+      <div>
+        <button type="submit">Add Airport</button>
+        <a href="{{ url_for('airline_staff_bp.flight_dashboard') }}">Cancel</a>
+      </div>
+    </form>
+
+    <div class="action-bar">
+      <a href="/staff/home">
+        <button type="button">Home</button>
+      </a>
     </div>
-  </form>
-
-  <div class="action-bar">
-    <a href="/staff/home">
-      <button type="button">Home</button>
-    </a>
-  </div>
-
-</body>
+  </body>
 </html>

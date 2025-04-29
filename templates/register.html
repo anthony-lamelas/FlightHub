@@ -1,124 +1,195 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Register</title>
-  <style>
-    button.plus { padding: 0 6px; }
-  </style>
-</head>
-<body>
-  <h1>Register</h1>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Register</title>
+    <style>
+      body {
+        background-color: honeydew;
+      }
+      button.plus {
+        padding: 0 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Register</h1>
 
-  <form method="POST" action="{{ url_for('auth.register') }}">
-    <!-- role selector -->
-    <label>
-      <input type="radio" name="role" value="customer" checked> Customer
-    </label>
-    <label>
-      <input type="radio" name="role" value="staff"> Airline Staff
-    </label>
-    <hr>
+    <form method="POST" action="{{ url_for('auth.register') }}">
+      <!-- role selector -->
+      <label>
+        <input type="radio" name="role" value="customer" checked /> Customer
+      </label>
+      <label>
+        <input type="radio" name="role" value="staff" /> Airline Staff
+      </label>
+      <hr />
 
-    <!-- ─────── Customer fields (visible by default) ─────── -->
-    <div id="customer-form">
-      <h2>Customer Info</h2>
+      <!-- ─────── Customer fields (visible by default) ─────── -->
+      <div id="customer-form">
+        <h2>Customer Info</h2>
 
-      <label>First Name:<br><input type="text" name="first_name"></label><br>
-      <label>Last Name:<br><input type="text" name="last_name"></label><br>
-      <label>Building Number:<br><input type="text" name="building_number"></label><br>
-      <label>Street:<br><input type="text" name="street"></label><br>
-      <label>City:<br><input type="text" name="city"></label><br>
-      <label>State:<br><input type="text" name="state"></label><br>
-      <label>Phone Number:<br><input type="text" name="phone_number"></label><br>
-      <label>Passport Number:<br><input type="text" name="passport_number"></label><br>
-      <label>Passport Country:<br><input type="text" name="passport_country"></label><br>
-      <label>Passport Expiration:<br><input type="date" name="passport_expiration"></label><br>
-      <label>Date of Birth:<br><input type="date" name="date_of_birth"></label><br>
-      <label>Email:<br><input type="email" name="email"></label><br>
-      <label>Password:<br><input type="password" name="password"></label><br>
-    </div>
-
-    <!-- ─────── Staff fields (hidden initially) ─────── -->
-    <div id="staff-form" style="display:none">
-      <h2>Airline Staff Info</h2>
-
-      <label>Username:<br><input type="text" name="username" required></label><br>
-      <label>First Name:<br><input type="text" name="first_name" required></label><br>
-      <label>Last Name:<br><input type="text" name="last_name" required></label><br>
-      <label>Date of Birth:<br><input type="date" name="date_of_birth" required></label><br>
-      <label>Airline Name:<br><input type="text" name="airline_name" required></label><br>
-
-      <!-- one required email + plus button -->
-      <label>Emails:</label><br>
-      <div id="email-box">
-        <input type="email" name="email" required>
+        <label>First Name:<br /><input type="text" name="first_name" /></label
+        ><br />
+        <label>Last Name:<br /><input type="text" name="last_name" /></label
+        ><br />
+        <label
+          >Building Number:<br /><input
+            type="text"
+            name="building_number" /></label
+        ><br />
+        <label>Street:<br /><input type="text" name="street" /></label><br />
+        <label>City:<br /><input type="text" name="city" /></label><br />
+        <label>State:<br /><input type="text" name="state" /></label><br />
+        <label
+          >Phone Number:<br /><input type="text" name="phone_number" /></label
+        ><br />
+        <label
+          >Passport Number:<br /><input
+            type="text"
+            name="passport_number" /></label
+        ><br />
+        <label
+          >Passport Country:<br /><input
+            type="text"
+            name="passport_country" /></label
+        ><br />
+        <label
+          >Passport Expiration:<br /><input
+            type="date"
+            name="passport_expiration" /></label
+        ><br />
+        <label
+          >Date of Birth:<br /><input type="date" name="date_of_birth" /></label
+        ><br />
+        <label>Email:<br /><input type="email" name="email" /></label><br />
+        <label>Password:<br /><input type="password" name="password" /></label
+        ><br />
       </div>
-      <button type="button" class="plus" onclick="addInput('email-box','email','email')">＋</button><br><br>
 
-      <!-- one required phone + plus button -->
-      <label>Phone Numbers:</label><br>
-      <div id="phone-box">
-        <input type="text" name="phone_number" required>
+      <!-- ─────── Staff fields (hidden initially) ─────── -->
+      <div id="staff-form" style="display: none">
+        <h2>Airline Staff Info</h2>
+
+        <label
+          >Username:<br /><input type="text" name="username" required /></label
+        ><br />
+        <label
+          >First Name:<br /><input
+            type="text"
+            name="first_name"
+            required /></label
+        ><br />
+        <label
+          >Last Name:<br /><input
+            type="text"
+            name="last_name"
+            required /></label
+        ><br />
+        <label
+          >Date of Birth:<br /><input
+            type="date"
+            name="date_of_birth"
+            required /></label
+        ><br />
+        <label
+          >Airline Name:<br /><input
+            type="text"
+            name="airline_name"
+            required /></label
+        ><br />
+
+        <!-- one required email + plus button -->
+        <label>Emails:</label><br />
+        <div id="email-box">
+          <input type="email" name="email" required />
+        </div>
+        <button
+          type="button"
+          class="plus"
+          onclick="addInput('email-box','email','email')"
+        >
+          ＋</button
+        ><br /><br />
+
+        <!-- one required phone + plus button -->
+        <label>Phone Numbers:</label><br />
+        <div id="phone-box">
+          <input type="text" name="phone_number" required />
+        </div>
+        <button
+          type="button"
+          class="plus"
+          onclick="addInput('phone-box','phone_number')"
+        >
+          ＋</button
+        ><br /><br />
+
+        <label
+          >Password:<br /><input
+            type="password"
+            name="password"
+            required /></label
+        ><br />
       </div>
-      <button type="button" class="plus" onclick="addInput('phone-box','phone_number')">＋</button><br><br>
 
-      <label>Password:<br><input type="password" name="password" required></label><br>
-    </div>
+      <button type="submit">Register</button>
+    </form>
 
-    <button type="submit">Register</button>
-  </form>
+    {% if error %}
+    <p style="color: red">{{ error }}</p>
+    {% endif %}
 
-  {% if error %}
-    <p style="color:red;">{{ error }}</p>
-  {% endif %}
+    <!-- ───── minimal JS helpers (at page end so DOM exists) ───── -->
+    <script>
+      function toggleBlock(block, enable) {
+        block.style.display = enable ? "block" : "none";
+        block.querySelectorAll("input").forEach((el) => {
+          if (enable) {
+            el.removeAttribute("disabled");
+          } else {
+            el.value = "";
+            el.setAttribute("disabled", "disabled");
+          }
+        });
+      }
 
-  <!-- ───── minimal JS helpers (at page end so DOM exists) ───── -->
-  <script>
-    function toggleBlock(block, enable) {
-      block.style.display = enable ? "block" : "none";
-      block.querySelectorAll("input").forEach(el => {
-        if (enable) {
-          el.removeAttribute("disabled");
-        } else {
-          el.value = "";
-          el.setAttribute("disabled", "disabled");
-        }
+      function toggleForm() {
+        const role = document.querySelector('input[name="role"]:checked').value;
+        toggleBlock(
+          document.getElementById("customer-form"),
+          role === "customer"
+        );
+        toggleBlock(document.getElementById("staff-form"), role === "staff");
+      }
+
+      function addInput(containerId, name, type = "text") {
+        const div = document.createElement("div");
+        div.innerHTML = `<input type="${type}" name="${name}" class="extra">`;
+        document.getElementById(containerId).appendChild(div);
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        /* restore role after server‑side error */
+        const selected = "{{ selected_role | default('customer') }}";
+        const radio = document.querySelector(
+          `input[name="role"][value="${selected}"]`
+        );
+        if (radio) radio.checked = true;
+
+        /* set initial visibility and bind change events */
+        toggleForm();
+        document
+          .querySelectorAll('input[name="role"]')
+          .forEach((r) => r.addEventListener("change", toggleForm));
       });
-    }
+    </script>
 
-    function toggleForm() {
-      const role = document.querySelector('input[name="role"]:checked').value;
-      toggleBlock(document.getElementById("customer-form"), role === "customer");
-      toggleBlock(document.getElementById("staff-form"),    role === "staff");
-    }
-
-    function addInput(containerId, name, type="text") {
-      const div = document.createElement("div");
-      div.innerHTML = `<input type="${type}" name="${name}" class="extra">`;
-      document.getElementById(containerId).appendChild(div);
-    }
-
-    document.addEventListener("DOMContentLoaded", function () {
-      /* restore role after server‑side error */
-      const selected = "{{ selected_role | default('customer') }}";
-      const radio = document.querySelector(`input[name="role"][value="${selected}"]`);
-      if (radio) radio.checked = true;
-
-      /* set initial visibility and bind change events */
-      toggleForm();
-      document.querySelectorAll('input[name="role"]').forEach(r =>
-        r.addEventListener("change", toggleForm));
-    });
-  </script>
-
-  
-<div class="action-bar">
-  <a href="/">
-    <button type="button">Back</button>
-  </a>
-</div>
-
-</body>
+    <div class="action-bar">
+      <a href="/">
+        <button type="button">Back</button>
+      </a>
+    </div>
+  </body>
 </html>

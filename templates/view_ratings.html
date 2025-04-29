@@ -1,23 +1,27 @@
+<style>
+  body {
+    background-color: honeydew;
+  }
+</style>
 <h1>Flight Ratings</h1>
 
-
 {% if ratings %}
-  <table border="1" cellpadding="8">
-    <tr>
-      <th>Flight Number</th>
-      <th>Average Rating</th>
-      <th>Comments</th>
-    </tr>
-    {% for flight in ratings %}
-      <tr>
-        <td>{{ flight.flight_number }}</td>
-        <td>{{ flight.avg_rating | round(2) }}</td>
-        <td>{{ flight.comments }}</td>
-      </tr>
-    {% endfor %}
-  </table>
+<table border="1" cellpadding="8">
+  <tr>
+    <th>Flight Number</th>
+    <th>Average Rating</th>
+    <th>Comments</th>
+  </tr>
+  {% for flight in ratings %}
+  <tr>
+    <td>{{ flight.flight_number }}</td>
+    <td>{{ flight.avg_rating | round(2) }}</td>
+    <td>{{ flight.comments }}</td>
+  </tr>
+  {% endfor %}
+</table>
 {% elif request.method == 'POST' %}
-  <p>No ratings found for your airline.</p>
+<p>No ratings found for your airline.</p>
 {% endif %}
 
 <div class="action-bar">
@@ -25,4 +29,3 @@
     <button type="button">Home</button>
   </a>
 </div>
-
