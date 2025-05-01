@@ -29,12 +29,12 @@
 
       <form method="POST">
         <div>
-          <label for="flight_number">Flight Number:</label>
-          <select name="flight_number" id="flight_number" required>
+          <label for="flight_number">Flight:</label>
+          <select name="flight_info" id="flight_info" required>
             <option value="" disabled selected>Select a Flight</option>
             {% for flight in flights %}
-            <option value="{{ flight.flight_number }}">
-              {{ flight.flight_number }}
+            <option value="{{ flight.flight_number }}||{{ flight.departure_date_time }}">
+              {{ flight.flight_number }} — {{ flight.departure_date_time }}
             </option>
             {% endfor %}
           </select>

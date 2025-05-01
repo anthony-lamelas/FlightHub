@@ -204,10 +204,11 @@ def change_flight_status():
 
     # 2. Fetch all flight numbers from the database
     cursor.execute(
-                """SELECT flight_number \
-                FROM flight
-                WHERE airline_name = %s
-                   """, (airline_name,))
+        """SELECT flight_number, departure_date_time
+        FROM flight
+        WHERE airline_name = %s
+        ORDER BY departure_date_time DESC
+        """, (airline_name,))
     
     flights = cursor.fetchall()
 
@@ -217,15 +218,19 @@ def change_flight_status():
     # 3. Handle POST (status update)
     if request.method == 'POST':
         new_status = request.form.get('flight_status')
-        flight_number = request.form.get('flight_number')
+        flight_info = request.form.get('flight_info')
+        flight_number, dep_time = flight_info.split("||")
+ 
         try:
             cursor.execute(
                 """
                 UPDATE flight
                 SET flight_status = %s
                 WHERE flight_number = %s
+                AND departure_date_time = %s
+                AND airline_name = %s
                 """,
-                (new_status, flight_number)
+                (new_status, flight_number, dep_time, airline_name)
             )
             conn.commit()
             flash('Flight status has been updated successfully.')
