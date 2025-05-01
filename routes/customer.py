@@ -2,11 +2,12 @@ from flask import Blueprint, render_template, session, redirect, request, flash,
 import mysql.connector
 from db_connection import *
 from datetime import datetime, timedelta
+from decimal import Decimal
 
 customer_bp = Blueprint('customer_bp', __name__)
 
 # Main customer home shows future flights by default
-@customer_bp.route("/customer-home", methods=["GET", "POST"])
+@customer_bp.route("/customer_home", methods=["GET", "POST"])
 def customer_home():
     if "user_id" not in session or session.get("user_type") != "customer":
         return redirect("/login")
@@ -15,10 +16,10 @@ def customer_home():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # Handle flight filtering 
+    # Handle flight filtering (optional)
     query = """
         SELECT DISTINCT f.flight_number, f.departure_airport_code, f.arrival_airport_code,
-                        f.departure_date_time, f.arrival_date_time, f.flight_status
+                        f.departure_date_time, f.arrival_date_time, f.flight_status, f.base_price
         FROM Flight f
         JOIN Ticket t ON f.flight_number = t.flight_number
                     AND f.departure_date_time = t.departure_date_time
@@ -95,7 +96,7 @@ def customer_home():
                            current_time_plus_24=current_time_plus_24)
 
 
-@customer_bp.route("/purchase-ticket", methods=["POST"])
+@customer_bp.route("/purchase_ticket", methods=["POST"])
 def purchase_ticket():
     # Check if user is logged in
     if "user_id" not in session or session.get("user_type") != "customer":
@@ -121,7 +122,7 @@ def purchase_ticket():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # 1) Get airplane_id and capacity for the flight
+    # Step 1: Get airplane_id and capacity for the flight
     cursor.execute("""
         SELECT f.airline_name, f.airplane_id, f.base_price, a.number_of_seats
         FROM Flight f
@@ -136,7 +137,7 @@ def purchase_ticket():
 
     airline_name, airplane_id, base_price, total_seats = flight_data
 
-    # 2) Count how many seats are booked (is_purchased = TRUE)
+    # Step 2: Count how many seats are booked (is_purchased = TRUE)
     cursor.execute("""
         SELECT COUNT(*) FROM Ticket
         WHERE flight_number = %s AND departure_date_time = %s AND airline_name = %s AND is_purchased = TRUE
@@ -147,7 +148,7 @@ def purchase_ticket():
         flash("This flight is fully booked.")
         return redirect("/customer_home")
 
-    # 3) Find an available ticket (not purchased)
+    # Step 3: Find an available ticket (not purchased)
     cursor.execute("""
         SELECT ticket_id, sold_price FROM Ticket
         WHERE flight_number = %s AND departure_date_time = %s AND airline_name = %s AND is_purchased = FALSE
@@ -161,20 +162,20 @@ def purchase_ticket():
 
     ticket_id, sold_price = ticket
 
-    # 4) Update price if demand > 60%
+    # Step 4: Update price if demand > 60%
     if booked_seats >= 0.6 * total_seats:
-        sold_price = round(base_price * 1.2, 2)
+        sold_price = round(base_price * Decimal(1.2), 2)
     else:
         sold_price = base_price
 
-    # 5) Update ticket as purchased and price
+    # Step 5: Update ticket as purchased and price
     cursor.execute("""
         UPDATE Ticket
         SET is_purchased = TRUE, sold_price = %s
         WHERE ticket_id = %s
     """, (sold_price, ticket_id))
 
-    # 6) Insert into Purchase table
+    # Step 6: Insert into Purchase table
     cursor.execute("""
         INSERT INTO Purchase (
             email, ticket_id, first_name, last_name, date_of_birth,
@@ -194,7 +195,7 @@ def purchase_ticket():
 
 
 
-@customer_bp.route("/purchase-ticket-form", methods=["POST"])
+@customer_bp.route("/purchase_ticket_form", methods=["POST"])
 def purchase_ticket_form():
     if "user_id" not in session or session.get("user_type") != "customer":
         return redirect("/login")
@@ -207,7 +208,7 @@ def purchase_ticket_form():
                            departure_date_time=departure_date_time)
 
 
-@customer_bp.route("/cancel-ticket", methods=["POST"])
+@customer_bp.route("/cancel_ticket", methods=["POST"])
 def cancel_ticket():
     if "user_id" not in session or session.get("user_type") != "customer":
         return redirect("/login")
@@ -218,7 +219,7 @@ def cancel_ticket():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # 1) Get flight departure time for the ticket
+    # Step 1: Get flight departure time for the ticket
     cursor.execute("""
         SELECT f.departure_date_time
         FROM Purchase p
@@ -240,11 +241,11 @@ def cancel_ticket():
     departure_time = result["departure_date_time"]
     curr_time_plus_24 = datetime.now() + timedelta(hours=24)
 
-    # 2) Check if cancellation is allowed
+    # Step 2: Check if cancellation is allowed
     if departure_time <= curr_time_plus_24:
         flash("You can only cancel tickets for flights more than 24 hours in the future.")
     else:
-        # 3) Cancel the ticket if allowed (mark Ticket as not purchased, delete from Purchase)
+        # Step 3: Cancel the ticket (mark Ticket as not purchased, delete from Purchase)
         cursor.execute("""
             UPDATE Ticket
             SET is_purchased = FALSE
@@ -264,7 +265,7 @@ def cancel_ticket():
     return redirect("/customer_home")
 
 
-@customer_bp.route("/review-ticket-form", methods=["POST"])
+@customer_bp.route("/review_ticket_form", methods=["POST"])
 def review_ticket_form():
     if "user_id" not in session or session.get("user_type") != "customer":
         return redirect("/login")
@@ -273,7 +274,7 @@ def review_ticket_form():
     return render_template("review_ticket.html", ticket_id=ticket_id)
 
 
-@customer_bp.route("/submit-review", methods=["POST"])
+@customer_bp.route("/submit_review", methods=["POST"])
 def submit_review():
     if "user_id" not in session or session.get("user_type") != "customer":
         return redirect("/login")

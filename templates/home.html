@@ -32,13 +32,13 @@
     <!-- Flight Search Form -->
     <form method="POST" action="{{ url_for('public_bp.search_flights') }}">
       <label for="source">From:</label>
-      <input type="text" name="source" placeholder="e.g. JFK" required />
+      <input type="text" name="source" placeholder="e.g. JFK or New York" />
 
       <label for="destination">To:</label>
-      <input type="text" name="destination" placeholder="e.g. LAX" required />
+      <input type="text" name="destination" placeholder="e.g. LAX or Los Angeles" />
 
       <label for="departure_date">Departure Date:</label>
-      <input type="date" name="departure_date" required />
+      <input type="date" name="departure_date" />
 
       <label for="return_date">Return Date (optional):</label>
       <input type="date" name="return_date" />
@@ -54,17 +54,19 @@
       {% for flight in departing_flights %}
       <li>
         <strong>Flight {{ flight.flight_number }}</strong><br />
-        {{ flight.departure_airport_code }} → {{ flight.arrival_airport_code
-        }}<br />
+        {{ flight.departure_airport_code }} ({{ flight.departure_city }}) →
+        {{ flight.arrival_airport_code }} ({{ flight.arrival_city }})<br />
         Departure: {{ flight.departure_date_time }}<br />
         Arrival: {{ flight.arrival_date_time }}<br />
         Base Price: ${{ flight.base_price }}
+        Status: {{ flight.flight_status }}
       </li>
       {% endfor %}
     </ul>
     {% else %}
     <p>No departing flights found.</p>
-    {% endif %} {% endif %}
+    {% endif %}
+    {% endif %}
 
     <!-- Return Flights Section -->
     {% if return_flights is defined %}
@@ -74,17 +76,19 @@
       {% for flight in return_flights %}
       <li>
         <strong>Flight {{ flight.flight_number }}</strong><br />
-        {{ flight.departure_airport_code }} → {{ flight.arrival_airport_code
-        }}<br />
+        {{ flight.departure_airport_code }} ({{ flight.departure_city }}) →
+        {{ flight.arrival_airport_code }} ({{ flight.arrival_city }})<br />
         Departure: {{ flight.departure_date_time }}<br />
         Arrival: {{ flight.arrival_date_time }}<br />
         Base Price: ${{ flight.base_price }}
+        Status: {{ flight.flight_status}}
       </li>
       {% endfor %}
     </ul>
     {% else %}
     <p>No return flights found.</p>
-    {% endif %} {% endif %}
+    {% endif %}
+    {% endif %}
 
     <!-- Navigation Buttons -->
     <div style="margin-top: 2rem">

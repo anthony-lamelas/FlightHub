@@ -109,6 +109,7 @@
             <th>Departure Date & Time</th>
             <th>Arrival Date & Time</th>
             <th>Status</th>
+            <th>Price</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -121,6 +122,7 @@
             <td>{{ flight.departure_date_time }}</td>
             <td>{{ flight.arrival_date_time }}</td>
             <td>{{ flight.flight_status }}</td>
+            <td>{{ flight.base_price }}</td>
             <td>
               <form
                 method="POST"

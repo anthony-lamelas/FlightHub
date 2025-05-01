@@ -8,7 +8,7 @@ airline_staff_bp = Blueprint(
     url_prefix='/staff'
 )
 
-@airline_staff_bp.route("/airline-staff-home")
+@airline_staff_bp.route("/airline_staff_home")
 def airline_staff_home():
     if "user_id" not in session or session.get("user_type") != "staff":
         return redirect("/login")
@@ -156,28 +156,34 @@ def create_flight():
 
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute(
-            """
-            INSERT INTO flight (
-              airline_name, airplane_id, flight_number, airport_code,
-              departure_airport_code, arrival_airport_code,
-              departure_date_time, arrival_date_time,
-              base_price, airplane_number, flight_status
-            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-            """,
-            (
+        try:
+            cursor.execute(
+                """
+                INSERT INTO flight (
                 airline_name, airplane_id, flight_number, airport_code,
                 departure_airport_code, arrival_airport_code,
                 departure_date_time, arrival_date_time,
                 base_price, airplane_number, flight_status
+                ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                """,
+                (
+                    airline_name, airplane_id, flight_number, airport_code,
+                    departure_airport_code, arrival_airport_code,
+                    departure_date_time, arrival_date_time,
+                    base_price, airplane_number, flight_status
+                )
             )
-        )
-        conn.commit()
-        cursor.close()
-        conn.close()
+            conn.commit()
+            return redirect("/staff/home")
 
-        # back to the dashboard
-        return redirect("/staff/home")
+        except mysql.connector.errors.IntegrityError:
+            conn.rollback()
+            flash("Flight already exists or is invalid.")
+            return redirect("/staff/create")
+
+        finally:
+            cursor.close()
+            conn.close()
 
     # GET → render the form
     return render_template('create_flight.html')
@@ -263,18 +269,25 @@ def add_airplane():
                 (airplane_id, airline_name, number_of_seats, manufacturing_company)
             )
             conn.commit()
+            flash("Airplane added successfully.", "success")
             return redirect(url_for('airline_staff_bp.flight_dashboard'))
+
+        except mysql.connector.errors.IntegrityError:
+            conn.rollback()
+            flash("Airplane already exists or is invalid.", "error")
+            return redirect("/staff/add-plane")
+
+        except Exception as e:
+            conn.rollback()
+            flash(f"Unexpected error: {str(e)}", "error")
+            return redirect("/staff/add-plane")
+
         finally:
             cursor.close()
             conn.close()
 
     return render_template('add_airplane.html')
 
-        # back to the dashboard
-    return redirect("/staff/home")
-
-    # GET → render the form
-    return render_template('create_flight.html')
 
 
 #----------------------------------------------#
@@ -286,10 +299,10 @@ def add_airport():
         return redirect(url_for('login'))
     
     if request.method == 'POST':
-        airport_code          = request.form.get('airport_code')
-        airport_name          = request.form.get('airport_name')
-        city                  = request.form.get('city')
-        country               = request.form.get('country')
+        airport_code   = request.form.get('airport_code')
+        airport_name   = request.form.get('airport_name')
+        city           = request.form.get('city')
+        country        = request.form.get('country')
 
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -303,12 +316,25 @@ def add_airport():
                 (airport_code, airport_name, city, country)
             )
             conn.commit()
+            flash("Airport added successfully.", "success")
             return redirect(url_for('airline_staff_bp.flight_dashboard'))
+
+        except mysql.connector.errors.IntegrityError:
+            conn.rollback()
+            flash("Airport already exists or input is invalid.", "error")
+            return redirect("/staff/add-airport")
+
+        except Exception as e:
+            conn.rollback()
+            flash(f"Unexpected error: {str(e)}", "error")
+            return redirect("/staff/add-airport")
+
         finally:
             cursor.close()
             conn.close()
 
     return render_template('add_airport.html')
+
 
 
 
@@ -391,7 +417,3 @@ def view_reports():
 
     return render_template('view_reports.html', report_data=report_data, from_date=from_date, to_date=to_date)
 
-
-
-
-# 8. Logout: The session is destroyed and a “goodbye” page or the login page is displayed. how do I do the logout
