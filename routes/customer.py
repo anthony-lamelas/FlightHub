@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 customer_bp = Blueprint('customer_bp', __name__)
 
 # Main customer home shows future flights by default
-@customer_bp.route("/customer_home", methods=["GET", "POST"])
+@customer_bp.route("/customer-home", methods=["GET", "POST"])
 def customer_home():
     if "user_id" not in session or session.get("user_type") != "customer":
         return redirect("/login")
@@ -95,7 +95,7 @@ def customer_home():
                            current_time_plus_24=current_time_plus_24)
 
 
-@customer_bp.route("/purchase_ticket", methods=["POST"])
+@customer_bp.route("/purchase-ticket", methods=["POST"])
 def purchase_ticket():
     # Check if user is logged in
     if "user_id" not in session or session.get("user_type") != "customer":
@@ -194,7 +194,7 @@ def purchase_ticket():
 
 
 
-@customer_bp.route("/purchase_ticket_form", methods=["POST"])
+@customer_bp.route("/purchase-ticket-form", methods=["POST"])
 def purchase_ticket_form():
     if "user_id" not in session or session.get("user_type") != "customer":
         return redirect("/login")
@@ -207,7 +207,7 @@ def purchase_ticket_form():
                            departure_date_time=departure_date_time)
 
 
-@customer_bp.route("/cancel_ticket", methods=["POST"])
+@customer_bp.route("/cancel-ticket", methods=["POST"])
 def cancel_ticket():
     if "user_id" not in session or session.get("user_type") != "customer":
         return redirect("/login")
@@ -264,7 +264,7 @@ def cancel_ticket():
     return redirect("/customer_home")
 
 
-@customer_bp.route("/review_ticket_form", methods=["POST"])
+@customer_bp.route("/review-ticket-form", methods=["POST"])
 def review_ticket_form():
     if "user_id" not in session or session.get("user_type") != "customer":
         return redirect("/login")
@@ -273,7 +273,7 @@ def review_ticket_form():
     return render_template("review_ticket.html", ticket_id=ticket_id)
 
 
-@customer_bp.route("/submit_review", methods=["POST"])
+@customer_bp.route("/submit-review", methods=["POST"])
 def submit_review():
     if "user_id" not in session or session.get("user_type") != "customer":
         return redirect("/login")

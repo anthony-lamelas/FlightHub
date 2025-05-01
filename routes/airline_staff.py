@@ -8,7 +8,7 @@ airline_staff_bp = Blueprint(
     url_prefix='/staff'
 )
 
-@airline_staff_bp.route("/airline_staff_home")
+@airline_staff_bp.route("/airline-staff-home")
 def airline_staff_home():
     if "user_id" not in session or session.get("user_type") != "staff":
         return redirect("/login")
