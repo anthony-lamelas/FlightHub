@@ -366,6 +366,7 @@ def view_ratings():
                 AND t.flight_number = f.flight_number
                 AND t.departure_date_time = f.departure_date_time
                 WHERE f.airline_name = %s
+                GROUP BY f.flight_number;
             """
         cursor.execute(query, (airline_name,))
         ratings_data = cursor.fetchall()
