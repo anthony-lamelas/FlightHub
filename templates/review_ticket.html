@@ -2,32 +2,357 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Review Flight</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Review Flight - FlightHub</title>
+    
     <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
       body {
-        background-color: honeydew;
+        background: linear-gradient(135deg, #f0fff0 0%, #e8f5e8 100%);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #2c3e50;
+        min-height: 100vh;
+        padding: 2rem;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .review-container {
+        background: white;
+        border-radius: 12px;
+        padding: 2.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+      }
+
+      .review-container:hover {
+        transform: translateY(-2px);
+      }
+
+      .review-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+      }
+
+      .review-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #f39c12, #e67e22);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.8rem;
+        color: white;
+      }
+
+      .review-header h2 {
+        color: #2c3e50;
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .review-header p {
+        color: #7f8c8d;
+        font-size: 1rem;
+      }
+
+      /* Form Groups */
+      .form-group {
+        margin-bottom: 2rem;
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.75rem;
+        font-size: 1rem;
+      }
+
+      /* Rating Section */
+      .rating-section {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border-left: 4px solid #f39c12;
+      }
+
+      .rating-input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e8f5e8;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        transition: border-color 0.3s ease;
+        font-family: inherit;
+        text-align: center;
+        font-weight: 600;
+      }
+
+      .rating-input:focus {
+        outline: none;
+        border-color: #f39c12;
+        box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.1);
+      }
+
+      .rating-help {
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        color: #7f8c8d;
+        text-align: center;
+      }
+
+      /* Star Display */
+      .star-display {
+        display: flex;
+        justify-content: center;
+        gap: 0.25rem;
+        margin-top: 0.75rem;
+        font-size: 1.5rem;
+      }
+
+      .star {
+        color: #ddd;
+        transition: color 0.2s ease;
+      }
+
+      .star.filled {
+        color: #f39c12;
+      }
+
+      /* Comment Section */
+      .comment-section {
+        margin-bottom: 2rem;
+      }
+
+      .comment-textarea {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid #e8f5e8;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+        font-family: inherit;
+        resize: vertical;
+        min-height: 120px;
+      }
+
+      .comment-textarea:focus {
+        outline: none;
+        border-color: #27ae60;
+        box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+      }
+
+      .comment-textarea::placeholder {
+        color: #bdc3c7;
+      }
+
+      /* Button Styles */
+      .btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        color: white;
+        box-shadow: 0 2px 10px rgba(39, 174, 96, 0.3);
+        width: 100%;
+        margin-top: 1rem;
+        font-size: 1.1rem;
+        padding: 1rem 1.5rem;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(39, 174, 96, 0.4);
+      }
+
+      /* Back Link */
+      .back-link {
+        text-align: center;
+        margin-top: 1.5rem;
+      }
+
+      .back-link a {
+        color: #3498db;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+      }
+
+      .back-link a:hover {
+        color: #2980b9;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        body {
+          padding: 1rem;
+        }
+
+        .review-container {
+          padding: 2rem;
+        }
+
+        .review-header h2 {
+          font-size: 1.5rem;
+        }
+
+        .rating-section {
+          padding: 1rem;
+        }
+      }
+
+      /* Review Tips */
+      .review-tips {
+        background: #e8f5e8;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 2rem;
+        font-size: 0.9rem;
+        color: #27ae60;
+      }
+
+      .review-tips h4 {
+        margin-bottom: 0.5rem;
+        color: #2c3e50;
+      }
+
+      .review-tips ul {
+        margin-left: 1rem;
+        margin-top: 0.5rem;
+      }
+
+      .review-tips li {
+        margin-bottom: 0.25rem;
       }
     </style>
   </head>
+
   <body>
-    <h2>Leave a Review</h2>
+    <div class="container">
+      <div class="review-container">
+        <div class="review-header">
+          <div class="review-icon">⭐</div>
+          <h2>Leave a Review</h2>
+          <p>Share your flight experience with us</p>
+        </div>
 
-    <form method="POST" action="{{ url_for('customer_bp.submit_review') }}">
-      <input type="hidden" name="ticket_id" value="{{ ticket_id }}" />
+        <div class="review-tips">
+          <h4>💡 Review Tips</h4>
+          <ul>
+            <li>Rate your overall flight experience from 1 to 5 stars</li>
+            <li>Share specific details about service, comfort, and punctuality</li>
+            <li>Help other travelers make informed decisions</li>
+          </ul>
+        </div>
 
-      <label for="rating">Rating (1-5):</label><br />
-      <input type="number" name="rating" min="1" max="5" required /><br /><br />
+        <form method="POST" action="{{ url_for('customer_bp.submit_review') }}">
+          <input type="hidden" name="ticket_id" value="{{ ticket_id }}" />
 
-      <label for="comments">Comment:</label><br />
-      <textarea name="comments" rows="4" cols="50" required></textarea
-      ><br /><br />
+          <!-- Rating Section -->
+          <div class="rating-section">
+            <div class="form-group">
+              <label for="rating">Overall Rating</label>
+              <input 
+                type="number" 
+                name="rating" 
+                id="rating"
+                class="rating-input"
+                min="1" 
+                max="5" 
+                placeholder="Enter rating (1-5)"
+                required 
+              />
+              <div class="rating-help">Select a rating from 1 (Poor) to 5 (Excellent)</div>
+              <div class="star-display" id="starDisplay">
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+              </div>
+            </div>
+          </div>
 
-      <button type="submit">Submit Review</button>
-    </form>
-    <div class="action-bar">
-      <a href="/customer_home">
-        <button type="button">Back</button>
-      </a>
+          <!-- Comment Section -->
+          <div class="comment-section">
+            <div class="form-group">
+              <label for="comments">Your Review</label>
+              <textarea 
+                name="comments" 
+                id="comments"
+                class="comment-textarea"
+                placeholder="Tell us about your flight experience... What did you like? What could be improved?"
+                required
+              ></textarea>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Submit Review</button>
+        </form>
+
+        <div class="back-link">
+          <a href="/customer_home">← Back to My Flights</a>
+        </div>
+      </div>
     </div>
+
+    <script>
+      // Interactive star rating display
+      const ratingInput = document.getElementById('rating');
+      const starDisplay = document.getElementById('starDisplay');
+      const stars = starDisplay.querySelectorAll('.star');
+
+      function updateStars(rating) {
+        stars.forEach((star, index) => {
+          if (index < rating) {
+            star.classList.add('filled');
+          } else {
+            star.classList.remove('filled');
+          }
+        });
+      }
+
+      ratingInput.addEventListener('input', function() {
+        const rating = parseInt(this.value);
+        if (rating >= 1 && rating <= 5) {
+          updateStars(rating);
+        }
+      });
+
+      // Allow clicking on stars to set rating
+      stars.forEach((star, index) => {
+        star.addEventListener('click', function() {
+          const rating = index + 1;
+          ratingInput.value = rating;
+          updateStars(rating);
+        });
+        
+        star.style.cursor = 'pointer';
+      });
+    </script>
   </body>
 </html>

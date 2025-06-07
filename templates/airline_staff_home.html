@@ -1,189 +1,554 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <meta charset="utf-8" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Airline Staff – Flight Dashboard</title>
+    
     <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
       body {
-        background-color: honeydew;
+        background: linear-gradient(135deg, #f0fff0 0%, #e8f5e8 100%);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #2c3e50;
+        min-height: 100vh;
       }
-      table {
-        border-collapse: collapse;
-        width: 100%;
-        margin-top: 1rem;
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
       }
-      th,
-      td {
-        border: 1px solid #ccc;
-        padding: 0.4rem;
+
+      /* Header Styles */
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: white;
+        padding: 1.5rem 2rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+      }
+
+      .header h1 {
+        color: #2c3e50;
+        font-size: 2rem;
+        font-weight: 600;
+      }
+
+      .logout-btn {
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(231, 76, 60, 0.3);
+      }
+
+      .logout-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+      }
+
+      /* Card Styles */
+      .card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+      }
+
+      .card:hover {
+        transform: translateY(-2px);
+      }
+
+      .card h2 {
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+        font-weight: 600;
+      }
+
+      .card h3 {
+        color: #34495e;
+        margin-bottom: 1rem;
+        font-size: 1.25rem;
+      }
+
+      /* Action Buttons Grid */
+      .action-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .action-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
         text-align: center;
       }
-      tr:nth-child(even) {
-        background: #f7f7f7;
+
+      .action-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
       }
-      form.inline label {
-        margin-right: 0.5rem;
+
+      .action-card a {
+        text-decoration: none;
+        color: inherit;
+        display: block;
       }
-      .action-bar {
-        margin: 1rem 0;
+
+      .action-card h3 {
+        color: #2c3e50;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
       }
-      .action-bar button {
-        padding: 0.6rem 1.2rem;
+
+      .action-card p {
+        color: #7f8c8d;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+      }
+
+      /* Search Form Styles */
+      .search-form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: end;
+        margin-bottom: 1.5rem;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        min-width: 140px;
+      }
+
+      .form-group label {
+        font-weight: 500;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+      }
+
+      .form-group input {
+        padding: 0.75rem;
+        border: 2px solid #e8f5e8;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+      }
+
+      .form-group input:focus {
+        outline: none;
+        border-color: #27ae60;
+        box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+      }
+
+      /* Button Styles */
+      .btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        color: white;
+        box-shadow: 0 2px 10px rgba(39, 174, 96, 0.3);
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(39, 174, 96, 0.4);
+      }
+
+      .btn-secondary {
+        background: #ecf0f1;
+        color: #2c3e50;
+        border: 2px solid #bdc3c7;
+      }
+
+      .btn-secondary:hover {
+        background: #d5dbdb;
+        transform: translateY(-1px);
+      }
+
+      .btn-action {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        color: white;
+        box-shadow: 0 2px 10px rgba(52, 152, 219, 0.3);
+        width: 100%;
+      }
+
+      .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(52, 152, 219, 0.4);
+      }
+
+      .btn-small {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+      }
+
+      /* Table Styles */
+      .table-container {
+        overflow-x: auto;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+      }
+
+      th {
+        background: linear-gradient(135deg, #2c3e50, #34495e);
+        color: white;
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      td {
+        padding: 1rem;
+        border-bottom: 1px solid #ecf0f1;
+        font-size: 0.95rem;
+      }
+
+      tr:hover {
+        background-color: #f8f9fa;
+      }
+
+      tr:last-child td {
+        border-bottom: none;
+      }
+
+      /* Status Badges */
+      .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        background: #d5f4e6;
+        color: #27ae60;
+      }
+
+      /* View Link Styling */
+      .view-link {
+        color: #3498db;
+        text-decoration: none;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+      }
+
+      .view-link:hover {
+        background: #3498db;
+        color: white;
+        transform: translateY(-1px);
+      }
+
+      /* Empty State */
+      .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #7f8c8d;
+      }
+
+      .empty-state p {
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+      }
+
+      /* Passengers List */
+      .passengers-list {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-top: 1rem;
+      }
+
+      .passengers-list ul {
+        list-style: none;
+        display: grid;
+        gap: 0.5rem;
+      }
+
+      .passengers-list li {
+        background: white;
+        padding: 1rem;
+        border-radius: 6px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .passenger-name {
+        font-weight: 500;
+        color: #2c3e50;
+      }
+
+      .passenger-email {
+        color: #7f8c8d;
+        font-size: 0.9rem;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .container {
+          padding: 1rem;
+        }
+
+        .header {
+          flex-direction: column;
+          gap: 1rem;
+          text-align: center;
+        }
+
+        .action-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .search-form {
+          flex-direction: column;
+        }
+
+        .form-group {
+          min-width: 100%;
+        }
+
+        table {
+          font-size: 0.8rem;
+        }
+
+        th, td {
+          padding: 0.5rem;
+        }
+      }
+
+      /* Icons for Action Cards */
+      .action-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.5rem;
+        color: white;
       }
     </style>
   </head>
+
   <body>
-    <div
-      style="display: flex; justify-content: space-between; align-items: center"
-    >
-      <h1 style="margin: 0">{{ airline_name }} – Staff Dashboard</h1>
-      <a
-        href="{{ url_for('auth.logout') }}"
-        style="
-          padding: 6px 12px;
-          background-color: rgb(170, 23, 23);
-          color: white;
-          text-decoration: none;
-          border-radius: 4px;
-        "
-        >Logout</a
-      >
+    <div class="container">
+      <!-- Header -->
+      <div class="header">
+        <h1>{{ airline_name }} – Staff Dashboard</h1>
+        <a href="{{ url_for('auth.logout') }}" class="logout-btn">Logout</a>
+      </div>
+
+      <!-- Action Cards Grid -->
+      <div class="action-grid">
+        <div class="action-card">
+          <div class="action-icon">✈️</div>
+          <h3>Create Flight</h3>
+          <p>Add new flights to your airline's schedule</p>
+          <a href="/staff/create" class="btn btn-action">Create Flight</a>
+        </div>
+
+        <div class="action-card">
+          <div class="action-icon">📊</div>
+          <h3>View Reports</h3>
+          <p>Access detailed analytics and reports</p>
+          <a href="/staff/view-reports" class="btn btn-action">View Reports</a>
+        </div>
+
+        <div class="action-card">
+          <div class="action-icon">🔄</div>
+          <h3>Flight Status</h3>
+          <p>Update and manage flight statuses</p>
+          <a href="/staff/status" class="btn btn-action">Change Status</a>
+        </div>
+
+        <div class="action-card">
+          <div class="action-icon">🛩️</div>
+          <h3>Add Airplane</h3>
+          <p>Register new aircraft to your fleet</p>
+          <a href="/staff/add-plane" class="btn btn-action">Add Airplane</a>
+        </div>
+
+        <div class="action-card">
+          <div class="action-icon">🏢</div>
+          <h3>Add Airport</h3>
+          <p>Add new airports to the network</p>
+          <a href="/staff/add-airport" class="btn btn-action">Add Airport</a>
+        </div>
+
+        <div class="action-card">
+          <div class="action-icon">⭐</div>
+          <h3>View Ratings</h3>
+          <p>Check flight ratings and feedback</p>
+          <a href="/staff/flight-ratings" class="btn btn-action">View Ratings</a>
+        </div>
+      </div>
+
+      <!-- Flight Search & Filter -->
+      <div class="card">
+        <h2>Flight Management</h2>
+        <form
+          class="search-form"
+          method="GET"
+          action="{{ url_for('airline_staff_bp.flight_dashboard') }}"
+        >
+          <div class="form-group">
+            <label for="from_date">From Date</label>
+            <input
+              type="date"
+              name="from_date"
+              id="from_date"
+              value="{{ request.args.get('from_date','') }}"
+            />
+          </div>
+          <div class="form-group">
+            <label for="to_date">To Date</label>
+            <input
+              type="date"
+              name="to_date"
+              id="to_date"
+              value="{{ request.args.get('to_date','') }}"
+            />
+          </div>
+          <div class="form-group">
+            <label for="src_code">Departure Airport</label>
+            <input
+              type="text"
+              name="src_code"
+              id="src_code"
+              placeholder="e.g. JFK"
+              value="{{ request.args.get('src_code','') }}"
+            />
+          </div>
+          <div class="form-group">
+            <label for="dest_code">Arrival Airport</label>
+            <input
+              type="text"
+              name="dest_code"
+              id="dest_code"
+              placeholder="e.g. LAX"
+              value="{{ request.args.get('dest_code','') }}"
+            />
+          </div>
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary">Filter Flights</button>
+          </div>
+          <div class="form-group">
+            <a href="{{ url_for('airline_staff_bp.flight_dashboard') }}" class="btn btn-secondary">Reset</a>
+          </div>
+        </form>
+
+        <!-- Flights Table -->
+        {% if flights %}
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Flight Number</th>
+                <th>Route</th>
+                <th>Departure Time</th>
+                <th>Status</th>
+                <th>Passengers</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for f in flights %}
+              <tr>
+                <td><strong>{{ f.flight_number }}</strong></td>
+                <td>{{ f.departure_airport_code }} → {{ f.arrival_airport_code }}</td>
+                <td>{{ f.departure_date_time }}</td>
+                <td>
+                  <span class="status-badge">{{ f.flight_status }}</span>
+                </td>
+                <td>
+                  <a
+                    href="{{ url_for('airline_staff_bp.view_flight_customers',
+                                      flight_number=f.flight_number,
+                                      dep_time=f.departure_date_time|replace(' ','T'),
+                                      from_date=request.args.get('from_date',''),
+                                      to_date=request.args.get('to_date',''),
+                                      src_code=request.args.get('src_code',''),
+                                      dest_code=request.args.get('dest_code','')
+                                     ) }}"
+                    class="view-link"
+                  >
+                    View Passengers
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+          <p>No flights match the selected criteria.</p>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Passengers List (if viewing specific flight) -->
+      {% if customers is defined and customers %}
+      <div class="card">
+        <h2>Passengers for Flight {{ sel_flight }}</h2>
+        <div class="passengers-list">
+          <ul>
+            {% for c in customers %}
+            <li>
+              <span class="passenger-name">{{ c.first_name }} {{ c.last_name }}</span>
+              <span class="passenger-email">{{ c.email }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% endif %}
     </div>
-
-    <!-- Create Flight Button -->
-    <div class="action-bar">
-      <a href="/staff/create">
-        <button type="button">Create Flight</button>
-      </a>
-    </div>
-
-    <!-- View Reports Button -->
-    <div class="action-bar">
-      <a href="/staff/view-reports">
-        <button type="button">View Reports</button>
-      </a>
-    </div>
-
-    <!-- Check Status Button -->
-    <div class="action-bar">
-      <a href="/staff/status">
-        <button type="button">Change Flight Status</button>
-      </a>
-    </div>
-
-    <!-- Add Plane Button -->
-    <div class="action-bar">
-      <a href="/staff/add-plane">
-        <button type="button">Add Airplane</button>
-      </a>
-    </div>
-
-    <!-- Add Airport Button -->
-    <div class="action-bar">
-      <a href="/staff/add-airport">
-        <button type="button">Add Airport</button>
-      </a>
-    </div>
-
-    <!-- View Ratings Button -->
-    <div class="action-bar">
-      <a href="/staff/flight-ratings">
-        <button type="button">View Ratings</button>
-      </a>
-    </div>
-
-    <!-- ───────── Search / Filter form ───────── -->
-    <form
-      class="inline"
-      method="GET"
-      action="{{ url_for('airline_staff_bp.flight_dashboard') }}"
-    >
-      <label
-        >From date:
-        <input
-          type="date"
-          name="from_date"
-          value="{{ request.args.get('from_date','') }}"
-      /></label>
-      <label
-        >To date:
-        <input
-          type="date"
-          name="to_date"
-          value="{{ request.args.get('to_date','') }}"
-      /></label>
-      <label
-        >Dep Airport:
-        <input
-          type="text"
-          name="src_code"
-          size="4"
-          value="{{ request.args.get('src_code','') }}"
-      /></label>
-      <label
-        >Arr Airport:
-        <input
-          type="text"
-          name="dest_code"
-          size="4"
-          value="{{ request.args.get('dest_code','') }}"
-      /></label>
-
-      <button type="submit">Filter</button>
-      <a href="{{ url_for('airline_staff_bp.flight_dashboard') }}">Reset</a>
-    </form>
-
-    <!-- ───────── Flights table ───────── -->
-    {% if flights %}
-    <table>
-      <thead>
-        <tr>
-          <th>Flight #</th>
-          <th>Departure</th>
-          <th>Arrival</th>
-          <th>Dep Time</th>
-          <th>Status</th>
-          <th>Passengers</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for f in flights %}
-        <tr>
-          <td>{{ f.flight_number }}</td>
-          <td>{{ f.departure_airport_code }}</td>
-          <td>{{ f.arrival_airport_code }}</td>
-          <td>{{ f.departure_date_time }}</td>
-          <td>{{ f.flight_status }}</td>
-          <td>
-            <a
-              href="{{ url_for('airline_staff_bp.view_flight_customers',
-                                flight_number=f.flight_number,
-                                dep_time=f.departure_date_time|replace(' ','T'),
-                                from_date=request.args.get('from_date',''),
-                                to_date=request.args.get('to_date',''),
-                                src_code=request.args.get('src_code',''),
-                                dest_code=request.args.get('dest_code','')
-                               ) }}"
-            >
-              View
-            </a>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    {% else %}
-    <p>No flights match this criteria.</p>
-    {% endif %}
-
-    <!-- Passengers list (optional block) -->
-    {% if customers is defined and customers %}
-    <h2>Passengers for Flight {{ sel_flight }}</h2>
-    <ul>
-      {% for c in customers %}
-      <li>{{ c.first_name }} {{ c.last_name }} – {{ c.email }}</li>
-      {% endfor %}
-    </ul>
-    {% endif %}
   </body>
 </html>

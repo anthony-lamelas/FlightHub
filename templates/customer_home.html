@@ -6,244 +6,544 @@
     <title>My Flights</title>
 
     <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
       body {
-        background-color: honeydew;
+        background: linear-gradient(135deg, #f0fff0 0%, #e8f5e8 100%);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #2c3e50;
+        min-height: 100vh;
       }
-      table {
-        border-collapse: collapse;
-        width: 100%;
-        margin-top: 1rem;
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
       }
-      th,
-      td {
-        border: 1px solid #ccc;
-        padding: 0.4rem;
+
+      /* Header Styles */
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: white;
+        padding: 1.5rem 2rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+      }
+
+      .header h1 {
+        color: #2c3e50;
+        font-size: 2rem;
+        font-weight: 600;
+      }
+
+      .logout-btn {
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(231, 76, 60, 0.3);
+      }
+
+      .logout-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+      }
+
+      /* Card Styles */
+      .card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+      }
+
+      .card:hover {
+        transform: translateY(-2px);
+      }
+
+      .card h2 {
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+        font-weight: 600;
+      }
+
+      .card h3 {
+        color: #34495e;
+        margin-bottom: 1rem;
+        font-size: 1.25rem;
+      }
+
+      /* Search Form Styles */
+      .search-form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: end;
+        margin-bottom: 1.5rem;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        min-width: 140px;
+      }
+
+      .form-group label {
+        font-weight: 500;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+      }
+
+      .form-group input {
+        padding: 0.75rem;
+        border: 2px solid #e8f5e8;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+      }
+
+      .form-group input:focus {
+        outline: none;
+        border-color: #27ae60;
+        box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+      }
+
+      /* Button Styles */
+      .btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
         text-align: center;
       }
-      tr:nth-child(even) {
-        background: #f7f7f7;
+
+      .btn-primary {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        color: white;
+        box-shadow: 0 2px 10px rgba(39, 174, 96, 0.3);
       }
-      form.inline label {
-        margin-right: 0.5rem;
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(39, 174, 96, 0.4);
       }
-      button {
-        padding: 0.3rem 0.6rem;
-        margin-top: 0.4rem;
+
+      .btn-secondary {
+        background: #ecf0f1;
+        color: #2c3e50;
+        border: 2px solid #bdc3c7;
+      }
+
+      .btn-secondary:hover {
+        background: #d5dbdb;
+        transform: translateY(-1px);
+      }
+
+      .btn-danger {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: white;
+        box-shadow: 0 2px 10px rgba(231, 76, 60, 0.3);
+      }
+
+      .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(231, 76, 60, 0.4);
+      }
+
+      .btn-small {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+      }
+
+      /* Filter Buttons */
+      .filter-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      /* Table Styles */
+      .table-container {
+        overflow-x: auto;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+      }
+
+      th {
+        background: linear-gradient(135deg, #2c3e50, #34495e);
+        color: white;
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      td {
+        padding: 1rem;
+        border-bottom: 1px solid #ecf0f1;
+        font-size: 0.95rem;
+      }
+
+      tr:hover {
+        background-color: #f8f9fa;
+      }
+
+      tr:last-child td {
+        border-bottom: none;
+      }
+
+      /* Status Badges */
+      .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .status-on-time {
+        background: #d5f4e6;
+        color: #27ae60;
+      }
+
+      .status-delayed {
+        background: #ffeaa7;
+        color: #f39c12;
+      }
+
+      .status-cancelled {
+        background: #ffcdd2;
+        color: #e74c3c;
+      }
+
+      /* Price Styling */
+      .price {
+        font-weight: 600;
+        color: #27ae60;
+        font-size: 1.1rem;
+      }
+
+      /* Empty State */
+      .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #7f8c8d;
+      }
+
+      .empty-state p {
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .container {
+          padding: 1rem;
+        }
+
+        .header {
+          flex-direction: column;
+          gap: 1rem;
+          text-align: center;
+        }
+
+        .search-form {
+          flex-direction: column;
+        }
+
+        .form-group {
+          min-width: 100%;
+        }
+
+        .filter-buttons {
+          flex-direction: column;
+        }
+
+        table {
+          font-size: 0.8rem;
+        }
+
+        th, td {
+          padding: 0.5rem;
+        }
+      }
+
+      /* Alert Styling */
+      .alert {
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        font-weight: 500;
+      }
+
+      .alert-info {
+        background: #e3f2fd;
+        color: #1976d2;
+        border-left: 4px solid #2196f3;
+      }
+
+      .alert-warning {
+        background: #fff3e0;
+        color: #f57c00;
+        border-left: 4px solid #ff9800;
       }
     </style>
   </head>
 
   <body>
-    <div
-      style="display: flex; justify-content: space-between; align-items: center"
-    >
-      <h1 style="margin: 0">My Flights</h1>
-      <a
-        href="{{ url_for('auth.logout') }}"
-        style="
-          padding: 6px 12px;
-          background-color: rgb(170, 23, 23);
-          color: white;
-          text-decoration: none;
-          border-radius: 4px;
-        "
-        >Logout</a
-      >
+    <div class="container">
+      <!-- Header -->
+      <div class="header">
+        <h1>My Flights</h1>
+        <a href="{{ url_for('auth.logout') }}" class="logout-btn">Logout</a>
+      </div>
+
+      <!-- Search Form -->
+      <div class="card">
+        <h2>Search Available Flights</h2>
+        <form
+          class="search-form"
+          method="POST"
+          action="{{ url_for('customer_bp.customer_home') }}"
+        >
+          <div class="form-group">
+            <label for="from_date">From Date</label>
+            <input
+              type="date"
+              name="from_date"
+              id="from_date"
+              value="{{ request.form.get('from_date','') }}"
+            />
+          </div>
+          <div class="form-group">
+            <label for="to_date">To Date</label>
+            <input
+              type="date"
+              name="to_date"
+              id="to_date"
+              value="{{ request.form.get('to_date','') }}"
+            />
+          </div>
+          <div class="form-group">
+            <label for="src_code">Departure Airport</label>
+            <input
+              type="text"
+              name="src_code"
+              id="src_code"
+              placeholder="e.g. JFK"
+              value="{{ request.form.get('src_code','') }}"
+            />
+          </div>
+          <div class="form-group">
+            <label for="dest_code">Arrival Airport</label>
+            <input
+              type="text"
+              name="dest_code"
+              id="dest_code"
+              placeholder="e.g. LAX"
+              value="{{ request.form.get('dest_code','') }}"
+            />
+          </div>
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary">Search Flights</button>
+          </div>
+          <div class="form-group">
+            <a href="{{ url_for('customer_bp.customer_home') }}" class="btn btn-secondary">Reset</a>
+          </div>
+        </form>
+      </div>
+
+      <!-- Search Results -->
+      {% if upcoming_flights %}
+      <div class="card">
+        <h2>Available Flights</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Flight Number</th>
+                <th>Route</th>
+                <th>Departure</th>
+                <th>Arrival</th>
+                <th>Status</th>
+                <th>Price</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for flight in upcoming_flights %}
+              <tr>
+                <td><strong>{{ flight.flight_number }}</strong></td>
+                <td>{{ flight.departure_airport_code }} → {{ flight.arrival_airport_code }}</td>
+                <td>{{ flight.departure_date_time }}</td>
+                <td>{{ flight.arrival_date_time }}</td>
+                <td>
+                  <span class="status-badge status-on-time">{{ flight.flight_status }}</span>
+                </td>
+                <td class="price">${{ flight.base_price }}</td>
+                <td>
+                  <form
+                    method="POST"
+                    action="{{ url_for('customer_bp.purchase_ticket_form') }}"
+                    style="display: inline"
+                  >
+                    <input
+                      type="hidden"
+                      name="flight_number"
+                      value="{{ flight.flight_number }}"
+                    />
+                    <input
+                      type="hidden"
+                      name="departure_date_time"
+                      value="{{ flight.departure_date_time }}"
+                    />
+                    <button type="submit" class="btn btn-primary btn-small">Purchase</button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% elif request.method == "POST" and 'filter_type' not in request.form %}
+      <div class="alert alert-warning">
+        <p><strong>No flights match your search criteria.</strong> Please try different filters.</p>
+      </div>
+      {% endif %}
+
+      <!-- My Booked Flights -->
+      <div class="card">
+        <h2>My Booked Flights</h2>
+        
+        <div class="filter-buttons">
+          <form method="POST" style="display: inline;">
+            <input type="hidden" name="filter_type" value="future" />
+            <button type="submit" class="btn btn-secondary">Upcoming Flights</button>
+          </form>
+          <form method="POST" style="display: inline;">
+            <input type="hidden" name="filter_type" value="past" />
+            <button type="submit" class="btn btn-secondary">Past Flights</button>
+          </form>
+        </div>
+
+        {% if filter_type == 'past' %}
+        <h3>My Past Flights</h3>
+        {% else %}
+        <h3>My Upcoming Flights</h3>
+        {% endif %}
+
+        {% if purchased_flights %}
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Ticket ID</th>
+                <th>Flight Number</th>
+                <th>Route</th>
+                <th>Departure</th>
+                <th>Arrival</th>
+                <th>Paid</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for flight in purchased_flights %}
+              <tr>
+                <td><strong>{{ flight.ticket_id }}</strong></td>
+                <td>{{ flight.flight_number }}</td>
+                <td>{{ flight.departure_airport_code }} → {{ flight.arrival_airport_code }}</td>
+                <td>{{ flight.departure_date_time }}</td>
+                <td>{{ flight.arrival_date_time }}</td>
+                <td class="price">${{ flight.sold_price | round(2) }}</td>
+                <td>
+                  <span class="status-badge status-on-time">{{ flight.flight_status }}</span>
+                </td>
+                <td>
+                  {% if filter_type == 'past' %}
+                  <form
+                    action="{{ url_for('customer_bp.review_ticket_form') }}"
+                    method="POST"
+                    style="display: inline"
+                  >
+                    <input
+                      type="hidden"
+                      name="ticket_id"
+                      value="{{ flight.ticket_id }}"
+                    />
+                    <button type="submit" class="btn btn-primary btn-small">Review</button>
+                  </form>
+                  {% else %}
+                    {% if flight.departure_date_time > current_time_plus_24 %}
+                    <form
+                      action="{{ url_for('customer_bp.cancel_ticket') }}"
+                      method="POST"
+                      style="display: inline"
+                    >
+                      <input
+                        type="hidden"
+                        name="ticket_id"
+                        value="{{ flight.ticket_id }}"
+                      />
+                      <button type="submit" class="btn btn-danger btn-small">Cancel</button>
+                    </form>
+                    {% else %}
+                    <span style="color: #7f8c8d; font-style: italic;">Cannot cancel</span>
+                    {% endif %}
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+          <p>No {{ filter_type }} flights found.</p>
+        </div>
+        {% endif %}
+      </div>
     </div>
-
-    <!-- ───────── Search Form ───────── -->
-    <form
-      class="inline"
-      method="POST"
-      action="{{ url_for('customer_bp.customer_home') }}"
-    >
-      <label
-        >From date:
-        <input
-          type="date"
-          name="from_date"
-          value="{{ request.form.get('from_date','') }}"
-        />
-      </label>
-      <label
-        >To date:
-        <input
-          type="date"
-          name="to_date"
-          value="{{ request.form.get('to_date','') }}"
-        />
-      </label>
-      <label
-        >Dep Airport:
-        <input
-          type="text"
-          name="src_code"
-          size="4"
-          value="{{ request.form.get('src_code','') }}"
-        />
-      </label>
-      <label
-        >Arr Airport:
-        <input
-          type="text"
-          name="dest_code"
-          size="4"
-          value="{{ request.form.get('dest_code','') }}"
-        />
-      </label>
-
-      <button type="submit">Search Flights</button>
-      <a href="{{ url_for('customer_bp.customer_home') }}">Reset</a>
-    </form>
-
-    <!-- ───────── Search Results ───────── -->
-    {% if upcoming_flights %}
-    <div>
-      <h2>Available Tickets</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Flight Number</th>
-            <th>Departure</th>
-            <th>Arrival</th>
-            <th>Departure Date & Time</th>
-            <th>Arrival Date & Time</th>
-            <th>Status</th>
-            <th>Price</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for flight in upcoming_flights %}
-          <tr>
-            <td>{{ flight.flight_number }}</td>
-            <td>{{ flight.departure_airport_code }}</td>
-            <td>{{ flight.arrival_airport_code }}</td>
-            <td>{{ flight.departure_date_time }}</td>
-            <td>{{ flight.arrival_date_time }}</td>
-            <td>{{ flight.flight_status }}</td>
-            <td>{{ flight.base_price }}</td>
-            <td>
-              <form
-                method="POST"
-                action="{{ url_for('customer_bp.purchase_ticket_form') }}"
-                style="display: inline"
-              >
-                <input
-                  type="hidden"
-                  name="flight_number"
-                  value="{{ flight.flight_number }}"
-                />
-                <input
-                  type="hidden"
-                  name="departure_date_time"
-                  value="{{ flight.departure_date_time }}"
-                />
-                <button type="submit">Purchase</button>
-              </form>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-    {% elif request.method == "POST" and 'filter_type' not in request.form %}
-    <p>
-      <strong
-        >No flights match your search criteria. Please try different
-        filters.</strong
-      >
-    </p>
-    {% endif %}
-
-    <!-- ───────── Purchased Flights Section ───────── -->
-    <h2>My Booked Flights</h2>
-    <form method="POST" style="margin-bottom: 1rem">
-      <input type="hidden" name="filter_type" value="future" />
-      <button type="submit">Upcoming</button>
-    </form>
-    <form method="POST" style="margin-bottom: 1rem">
-      <input type="hidden" name="filter_type" value="past" />
-      <button type="submit">Past</button>
-    </form>
-
-    {% if filter_type == 'past' %}
-    <h3>My Past Flights</h3>
-    {% else %}
-    <h3>My Upcoming Flights</h3>
-    {% endif %} {% if purchased_flights %}
-    <table>
-      <thead>
-        <tr>
-          <th>Ticket ID</th>
-          <th>Flight Number</th>
-          <th>Departure</th>
-          <th>Arrival</th>
-          <th>Departure Date & Time</th>
-          <th>Arrival Date & Time</th>
-          <th>Sold Price ($)</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for flight in purchased_flights %}
-        <tr>
-          <td>{{ flight.ticket_id }}</td>
-          <td>{{ flight.flight_number }}</td>
-          <td>{{ flight.departure_airport_code }}</td>
-          <td>{{ flight.arrival_airport_code }}</td>
-          <td>{{ flight.departure_date_time }}</td>
-          <td>{{ flight.arrival_date_time }}</td>
-          <td>{{ flight.sold_price | round(2) }}</td>
-          <td>{{ flight.flight_status }}</td>
-          <td>
-            {% if filter_type == 'past' %}
-            <form
-              action="{{ url_for('customer_bp.review_ticket_form') }}"
-              method="POST"
-              style="display: inline"
-            >
-              <input
-                type="hidden"
-                name="ticket_id"
-                value="{{ flight.ticket_id }}"
-              />
-              <button type="submit">Review Flight</button>
-            </form>
-            {% else %} {% if flight.departure_date_time > current_time_plus_24
-            %}
-            <form
-              action="{{ url_for('customer_bp.cancel_ticket') }}"
-              method="POST"
-              style="display: inline"
-            >
-              <input
-                type="hidden"
-                name="ticket_id"
-                value="{{ flight.ticket_id }}"
-              />
-              <button type="submit">Cancel Ticket</button>
-            </form>
-            {% else %}
-            <em>Cannot cancel</em>
-            {% endif %} {% endif %}
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    {% else %}
-    <p>No {{ filter_type }} flights found.</p>
-    {% endif %}
 
     <!-- Flash Message Script -->
-    {% with messages = get_flashed_messages() %} {% if messages %}
-    <script>
-      {% for message in messages %}
-        alert("{{ message }}");
-      {% endfor %}
-    </script>
-    {% endif %} {% endwith %}
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+      <script>
+        {% for message in messages %}
+          alert("{{ message }}");
+        {% endfor %}
+      </script>
+      {% endif %}
+    {% endwith %}
   </body>
 </html>

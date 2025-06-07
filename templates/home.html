@@ -1,106 +1,424 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Homepage</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FlightHub - Welcome</title>
 
     <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
       body {
-        background-color: honeydew;
-        font-family: sans-serif;
+        background: linear-gradient(135deg, #f0fff0 0%, #e8f5e8 100%);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #2c3e50;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
         padding: 2rem;
       }
-      form {
+
+      /* Header Styles */
+      .hero {
+        text-align: center;
+        background: white;
+        padding: 3rem 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         margin-bottom: 2rem;
       }
-      button {
-        margin: 0.5rem;
-        padding: 0.6rem 1.2rem;
+
+      .hero h1 {
+        color: #2c3e50;
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #2c3e50, #3498db);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .hero p {
+        color: #7f8c8d;
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+      }
+
+      /* Card Styles */
+      .card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+      }
+
+      .card:hover {
+        transform: translateY(-2px);
+      }
+
+      .card h2 {
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+        font-weight: 600;
+      }
+
+      /* Search Form Styles */
+      .search-form {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .form-group label {
+        font-weight: 500;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+      }
+
+      .form-group input {
+        padding: 0.75rem;
+        border: 2px solid #e8f5e8;
+        border-radius: 8px;
         font-size: 1rem;
-        cursor: pointer;
+        transition: border-color 0.3s ease;
       }
-      h1 {
-        margin-bottom: 2rem;
+
+      .form-group input:focus {
+        outline: none;
+        border-color: #27ae60;
+        box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+      }
+
+      .search-btn-container {
+        grid-column: 1 / -1;
+        display: flex;
+        justify-content: center;
+        margin-top: 1rem;
+      }
+
+      /* Button Styles */
+      .btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        color: white;
+        box-shadow: 0 2px 10px rgba(39, 174, 96, 0.3);
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(39, 174, 96, 0.4);
+      }
+
+      .btn-secondary {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        color: white;
+        box-shadow: 0 2px 10px rgba(52, 152, 219, 0.3);
+      }
+
+      .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(52, 152, 219, 0.4);
+      }
+
+      .btn-outline {
+        background: transparent;
+        color: #2c3e50;
+        border: 2px solid #bdc3c7;
+      }
+
+      .btn-outline:hover {
+        background: #ecf0f1;
+        transform: translateY(-1px);
+      }
+
+      /* Navigation Buttons */
+      .nav-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      /* Flight Cards */
+      .flights-grid {
+        display: grid;
+        gap: 1rem;
+      }
+
+      .flight-card {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+        border-left: 4px solid #3498db;
+        transition: all 0.3s ease;
+      }
+
+      .flight-card:hover {
+        transform: translateX(4px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .flight-number {
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .flight-route {
+        color: #3498db;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+      }
+
+      .flight-details {
+        color: #7f8c8d;
+        font-size: 0.9rem;
+        line-height: 1.5;
+      }
+
+      .flight-price {
+        color: #27ae60;
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-top: 0.5rem;
+      }
+
+      .flight-status {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        background: #d5f4e6;
+        color: #27ae60;
+        margin-top: 0.5rem;
+      }
+
+      /* Empty State */
+      .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #7f8c8d;
+      }
+
+      .empty-state p {
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .container {
+          padding: 1rem;
+        }
+
+        .hero h1 {
+          font-size: 2rem;
+        }
+
+        .hero {
+          padding: 2rem 1rem;
+        }
+
+        .search-form {
+          grid-template-columns: 1fr;
+        }
+
+        .nav-buttons {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .btn {
+          width: 100%;
+          max-width: 300px;
+        }
+      }
+
+      /* Feature Icons */
+      .feature-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.8rem;
+        color: white;
       }
     </style>
   </head>
 
   <body>
-    <h1>Welcome to FlightHub</h1>
+    <div class="container">
+      <!-- Hero Section -->
+      <div class="hero">
+        <div class="feature-icon">✈️</div>
+        <h1>Welcome to FlightHub</h1>
+        <p>Your gateway to seamless flight booking and management</p>
+      </div>
 
-    <!-- Flight Search Form -->
-    <form method="POST" action="{{ url_for('public_bp.search_flights') }}">
-      <label for="source">From:</label>
-      <input type="text" name="source" placeholder="e.g. JFK or New York" />
+      <!-- Get Started Section -->
+      <div class="card">
+        <h2>Get Started</h2>
+        <div class="nav-buttons">
+          <a href="{{ url_for('auth.register') }}" class="btn btn-primary">
+            Register New Account
+          </a>
+          <a href="/login/customer" class="btn btn-secondary">
+            Customer Login
+          </a>
+          <a href="/login/staff" class="btn btn-outline">
+            Staff Login
+          </a>
+        </div>
+      </div>
 
-      <label for="destination">To:</label>
-      <input type="text" name="destination" placeholder="e.g. LAX or Los Angeles" />
+      <!-- Flight Search Form -->
+      <div class="card">
+        <h2>Search Flights</h2>
+        <form method="POST" action="{{ url_for('public_bp.search_flights') }}">
+          <div class="search-form">
+            <div class="form-group">
+              <label for="source">From</label>
+              <input 
+                type="text" 
+                name="source" 
+                id="source"
+                placeholder="e.g. JFK or New York" 
+              />
+            </div>
 
-      <label for="departure_date">Departure Date:</label>
-      <input type="date" name="departure_date" />
+            <div class="form-group">
+              <label for="destination">To</label>
+              <input 
+                type="text" 
+                name="destination" 
+                id="destination"
+                placeholder="e.g. LAX or Los Angeles" 
+              />
+            </div>
 
-      <label for="return_date">Return Date (optional):</label>
-      <input type="date" name="return_date" />
+            <div class="form-group">
+              <label for="departure_date">Departure Date</label>
+              <input 
+                type="date" 
+                name="departure_date" 
+                id="departure_date"
+              />
+            </div>
 
-      <button type="submit">Search Flights</button>
-    </form>
+            <div class="form-group">
+              <label for="return_date">Return Date (optional)</label>
+              <input 
+                type="date" 
+                name="return_date" 
+                id="return_date"
+              />
+            </div>
 
-    <!-- Departing Flights Section -->
-    {% if departing_flights is defined %}
-    <h2>Departing Flights</h2>
-    {% if departing_flights %}
-    <ul>
-      {% for flight in departing_flights %}
-      <li>
-        <strong>Flight {{ flight.flight_number }}</strong><br />
-        {{ flight.departure_airport_code }} ({{ flight.departure_city }}) →
-        {{ flight.arrival_airport_code }} ({{ flight.arrival_city }})<br />
-        Departure: {{ flight.departure_date_time }}<br />
-        Arrival: {{ flight.arrival_date_time }}<br />
-        Base Price: ${{ flight.base_price }}
-        Status: {{ flight.flight_status }}
-      </li>
-      {% endfor %}
-    </ul>
-    {% else %}
-    <p>No departing flights found.</p>
-    {% endif %}
-    {% endif %}
+            <div class="search-btn-container">
+              <button type="submit" class="btn btn-primary">Search Flights</button>
+            </div>
+          </div>
+        </form>
+      </div>
 
-    <!-- Return Flights Section -->
-    {% if return_flights is defined %}
-    <h2>Return Flights</h2>
-    {% if return_flights %}
-    <ul>
-      {% for flight in return_flights %}
-      <li>
-        <strong>Flight {{ flight.flight_number }}</strong><br />
-        {{ flight.departure_airport_code }} ({{ flight.departure_city }}) →
-        {{ flight.arrival_airport_code }} ({{ flight.arrival_city }})<br />
-        Departure: {{ flight.departure_date_time }}<br />
-        Arrival: {{ flight.arrival_date_time }}<br />
-        Base Price: ${{ flight.base_price }}
-        Status: {{ flight.flight_status}}
-      </li>
-      {% endfor %}
-    </ul>
-    {% else %}
-    <p>No return flights found.</p>
-    {% endif %}
-    {% endif %}
+      <!-- Departing Flights Section -->
+      {% if departing_flights is defined %}
+      <div class="card">
+        <h2>Departing Flights</h2>
+        {% if departing_flights %}
+        <div class="flights-grid">
+          {% for flight in departing_flights %}
+          <div class="flight-card">
+            <div class="flight-number">Flight {{ flight.flight_number }}</div>
+            <div class="flight-route">
+              {{ flight.departure_airport_code }} ({{ flight.departure_city }}) 
+              → {{ flight.arrival_airport_code }} ({{ flight.arrival_city }})
+            </div>
+            <div class="flight-details">
+              <strong>Departure:</strong> {{ flight.departure_date_time }}<br />
+              <strong>Arrival:</strong> {{ flight.arrival_date_time }}
+            </div>
+            <div class="flight-price">Base Price: ${{ flight.base_price }}</div>
+            <div class="flight-status">{{ flight.flight_status }}</div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+          <p>No departing flights found.</p>
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
 
-    <!-- Navigation Buttons -->
-    <div style="margin-top: 2rem">
-      <a href="{{ url_for('auth.register') }}">
-        <button type="button">Register</button>
-      </a>
-      <a href="/login/customer">
-        <button type="button">Customer Login</button>
-      </a>
-      <a href="/login/staff">
-        <button type="button">Staff Login</button>
-      </a>
+      <!-- Return Flights Section -->
+      {% if return_flights is defined %}
+      <div class="card">
+        <h2>Return Flights</h2>
+        {% if return_flights %}
+        <div class="flights-grid">
+          {% for flight in return_flights %}
+          <div class="flight-card">
+            <div class="flight-number">Flight {{ flight.flight_number }}</div>
+            <div class="flight-route">
+              {{ flight.departure_airport_code }} ({{ flight.departure_city }}) 
+              → {{ flight.arrival_airport_code }} ({{ flight.arrival_city }})
+            </div>
+            <div class="flight-details">
+              <strong>Departure:</strong> {{ flight.departure_date_time }}<br />
+              <strong>Arrival:</strong> {{ flight.arrival_date_time }}
+            </div>
+            <div class="flight-price">Base Price: ${{ flight.base_price }}</div>
+            <div class="flight-status">{{ flight.flight_status }}</div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+          <p>No return flights found.</p>
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
     </div>
   </body>
 </html>

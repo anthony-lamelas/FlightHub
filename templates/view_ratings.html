@@ -1,31 +1,367 @@
-<style>
-  body {
-    background-color: honeydew;
-  }
-</style>
-<h1>Flight Ratings</h1>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flight Ratings - FlightHub</title>
+    
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-{% if ratings %}
-<table border="1" cellpadding="8">
-  <tr>
-    <th>Flight Number</th>
-    <th>Average Rating</th>
-    <th>Comments</th>
-  </tr>
-  {% for flight in ratings %}
-  <tr>
-    <td>{{ flight.flight_number }}</td>
-    <td>{{ flight.avg_rating | round(2) }}</td>
-    <td>{{ flight.comments }}</td>
-  </tr>
-  {% endfor %}
-</table>
-{% elif request.method == 'POST' %}
-<p>No ratings found for your airline.</p>
-{% endif %}
+      body {
+        background: linear-gradient(135deg, #f0fff0 0%, #e8f5e8 100%);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #2c3e50;
+        min-height: 100vh;
+        padding: 2rem;
+      }
 
-<div class="action-bar">
-  <a href="/staff/home">
-    <button type="button">Home</button>
-  </a>
-</div>
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+      }
+
+      .ratings-container {
+        background: white;
+        border-radius: 12px;
+        padding: 2.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+      }
+
+      .ratings-container:hover {
+        transform: translateY(-2px);
+      }
+
+      .ratings-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+      }
+
+      .ratings-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #f39c12, #e67e22);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.8rem;
+        color: white;
+      }
+
+      .ratings-header h1 {
+        color: #2c3e50;
+        font-size: 2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .ratings-header p {
+        color: #7f8c8d;
+        font-size: 1rem;
+      }
+
+      /* Table Styles */
+      .ratings-table-container {
+        overflow-x: auto;
+        margin-bottom: 2rem;
+      }
+
+      .ratings-table {
+        width: 100%;
+        border-collapse: collapse;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .ratings-table th {
+        background: linear-gradient(135deg, #2c3e50, #34495e);
+        color: white;
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .ratings-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #ecf0f1;
+        vertical-align: top;
+      }
+
+      .ratings-table tr:hover {
+        background-color: #f8f9fa;
+      }
+
+      .ratings-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      /* Flight Number Column */
+      .flight-number {
+        font-weight: 600;
+        color: #3498db;
+        font-size: 1rem;
+      }
+
+      /* Rating Column */
+      .rating-cell {
+        text-align: center;
+      }
+
+      .rating-value {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: #f8f9fa;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 1rem;
+      }
+
+      .rating-high {
+        background: #d4edda;
+        color: #155724;
+      }
+
+      .rating-medium {
+        background: #fff3cd;
+        color: #856404;
+      }
+
+      .rating-low {
+        background: #f8d7da;
+        color: #721c24;
+      }
+
+      .stars {
+        color: #f39c12;
+        font-size: 0.9rem;
+      }
+
+      /* Comments Column */
+      .comments-cell {
+        max-width: 300px;
+      }
+
+      .comment-text {
+        line-height: 1.5;
+        color: #2c3e50;
+      }
+
+      .comment-preview {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      /* No Ratings Message */
+      .no-ratings {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: #7f8c8d;
+      }
+
+      .no-ratings-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+      }
+
+      .no-ratings h3 {
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        font-size: 1.3rem;
+      }
+
+      .no-ratings p {
+        font-size: 1rem;
+        line-height: 1.6;
+      }
+
+      /* Button Styles */
+      .btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+      }
+
+      .btn-secondary {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        color: white;
+        box-shadow: 0 2px 10px rgba(52, 152, 219, 0.3);
+      }
+
+      .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(52, 152, 219, 0.4);
+      }
+
+      /* Back Link */
+      .back-link {
+        text-align: center;
+        margin-top: 2rem;
+      }
+
+      /* Statistics */
+      .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .stat-card {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        text-align: center;
+        border-left: 4px solid #3498db;
+      }
+
+      .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+      }
+
+      .stat-label {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        body {
+          padding: 1rem;
+        }
+
+        .ratings-container {
+          padding: 2rem;
+        }
+
+        .ratings-header h1 {
+          font-size: 1.6rem;
+        }
+
+        .ratings-table th,
+        .ratings-table td {
+          padding: 0.75rem 0.5rem;
+          font-size: 0.9rem;
+        }
+
+        .comments-cell {
+          max-width: 200px;
+        }
+
+        .stats-container {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .ratings-table th:nth-child(3),
+        .ratings-table td:nth-child(3) {
+          display: none;
+        }
+        
+        .comments-cell {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="ratings-container">
+        <div class="ratings-header">
+          <div class="ratings-icon">📊</div>
+          <h1>Flight Ratings</h1>
+          <p>Customer feedback and ratings for your flights</p>
+        </div>
+
+        {% if ratings %}
+          <!-- Statistics Section -->
+          <div class="stats-container">
+            <div class="stat-card">
+              <div class="stat-value">{{ ratings|length }}</div>
+              <div class="stat-label">Total Flights Rated</div>
+            </div>
+          </div>
+
+          <!-- Ratings Table -->
+          <div class="ratings-table-container">
+            <table class="ratings-table">
+              <thead>
+                <tr>
+                  <th>Flight Number</th>
+                  <th>Average Rating</th>
+                  <th>Comments</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for flight in ratings %}
+                <tr>
+                  <td>
+                    <div class="flight-number">{{ flight.flight_number }}</div>
+                  </td>
+                  <td class="rating-cell">
+                    {% set rating = flight.avg_rating | round(2) %}
+                    <div class="rating-value 
+                      {% if rating >= 4 %}rating-high
+                      {% elif rating >= 3 %}rating-medium
+                      {% else %}rating-low{% endif %}">
+                      <span class="stars">
+                        {% for i in range(5) %}
+                          {% if i < rating %}★{% else %}☆{% endif %}
+                        {% endfor %}
+                      </span>
+                      {{ rating }}
+                    </div>
+                  </td>
+                  <td class="comments-cell">
+                    <div class="comment-text comment-preview">{{ flight.comments }}</div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% elif request.method == 'POST' %}
+          <div class="no-ratings">
+            <div class="no-ratings-icon">📋</div>
+            <h3>No Ratings Found</h3>
+            <p>No ratings found for your airline. Customer reviews will appear here once flights are rated.</p>
+          </div>
+        {% endif %}
+
+        <div class="back-link">
+          <a href="/staff/home" class="btn btn-secondary">← Back to Staff Home</a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

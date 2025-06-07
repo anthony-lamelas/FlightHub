@@ -1,16 +1,229 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Login Page</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - FlightHub</title>
 
     <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
       body {
-        background-color: honeydew;
+        background: linear-gradient(135deg, #f0fff0 0%, #e8f5e8 100%);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #2c3e50;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+      }
+
+      .login-container {
+        background: white;
+        border-radius: 12px;
+        padding: 2.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+        transition: transform 0.3s ease;
+      }
+
+      .login-container:hover {
+        transform: translateY(-2px);
+      }
+
+      .login-header {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      .login-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.8rem;
+        color: white;
+      }
+
+      .login-header h1 {
+        color: #2c3e50;
+        font-size: 2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .login-header p {
+        color: #7f8c8d;
+        font-size: 1rem;
+      }
+
+      /* Role Selection */
+      .role-selection {
+        margin-bottom: 2rem;
+      }
+
+      .role-selection h3 {
+        color: #2c3e50;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        text-align: center;
+      }
+
+      .role-options {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+      }
+
+      .role-option {
+        flex: 1;
+        position: relative;
+      }
+
+      .role-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+      }
+
+      .role-option label {
+        display: block;
+        padding: 1rem;
+        border: 2px solid #e8f5e8;
+        border-radius: 8px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        background: #f8f9fa;
+      }
+
+      .role-option input[type="radio"]:checked + label {
+        border-color: #3498db;
+        background: #e3f2fd;
+        color: #2980b9;
+        transform: translateY(-2px);
+      }
+
+      .role-option label:hover {
+        border-color: #bdc3c7;
+        transform: translateY(-1px);
+      }
+
+      /* Form Styles */
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: 500;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+      }
+
+      .form-group input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e8f5e8;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+      }
+
+      .form-group input:focus {
+        outline: none;
+        border-color: #27ae60;
+        box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+      }
+
+      /* Button Styles */
+      .btn {
+        width: 100%;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        color: white;
+        box-shadow: 0 2px 10px rgba(39, 174, 96, 0.3);
+        margin-top: 1rem;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(39, 174, 96, 0.4);
+      }
+
+      /* Login Form Sections */
+      .login-form {
+        transition: all 0.3s ease;
+      }
+
+      /* Error Message */
+      .error-message {
+        background: #ffebee;
+        color: #c62828;
+        padding: 1rem;
+        border-radius: 8px;
+        border-left: 4px solid #f44336;
+        margin-top: 1rem;
+        font-weight: 500;
+      }
+
+      /* Back Link */
+      .back-link {
+        text-align: center;
+        margin-top: 1.5rem;
+      }
+
+      .back-link a {
+        color: #3498db;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+      }
+
+      .back-link a:hover {
+        color: #2980b9;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 480px) {
+        body {
+          padding: 1rem;
+        }
+
+        .login-container {
+          padding: 2rem;
+        }
+
+        .role-options {
+          flex-direction: column;
+        }
+
+        .login-header h1 {
+          font-size: 1.5rem;
+        }
       }
     </style>
   </head>
+
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const selected = "{{ selected_role | default('customer') }}";
@@ -19,13 +232,111 @@
       );
       if (radio) {
         radio.checked = true;
-        toggleForm;
+        toggleForm();
       }
     });
   </script>
 
   <body>
-    <h1>Login</h1>
+    <div class="login-container">
+      <div class="login-header">
+        <div class="login-icon">🔐</div>
+        <h1>Welcome Back</h1>
+        <p>Sign in to your FlightHub account</p>
+      </div>
+
+      <form method="POST" action="/login">
+        <!-- Role Selection -->
+        <div class="role-selection">
+          <h3>Select Account Type</h3>
+          <div class="role-options">
+            <div class="role-option">
+              <input
+                type="radio"
+                name="role"
+                id="role-customer"
+                value="customer"
+                checked
+                onchange="toggleForm()"
+              />
+              <label for="role-customer">Customer</label>
+            </div>
+            <div class="role-option">
+              <input
+                type="radio"
+                name="role"
+                id="role-staff"
+                value="staff"
+                onchange="toggleForm()"
+              />
+              <label for="role-staff">Airline Staff</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Customer Login Form -->
+        <div id="customer-login" class="login-form" style="display: block">
+          <div class="form-group">
+            <label for="customer-email">Email Address</label>
+            <input
+              type="text"
+              id="customer-email"
+              name="customer_identifier"
+              placeholder="Enter your email"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="customer-password">Password</label>
+            <input
+              type="password"
+              id="customer-password"
+              name="customer_password"
+              placeholder="Enter your password"
+              required
+            />
+          </div>
+
+          <button type="submit" class="btn">Sign In</button>
+        </div>
+
+        <!-- Staff Login Form -->
+        <div id="staff-login" class="login-form" style="display: none">
+          <div class="form-group">
+            <label for="staff-username">Username</label>
+            <input
+              type="text"
+              id="staff-username"
+              name="staff_identifier"
+              placeholder="Enter your username"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="staff-password">Password</label>
+            <input
+              type="password"
+              id="staff-password"
+              name="staff_password"
+              placeholder="Enter your password"
+              required
+            />
+          </div>
+
+          <button type="submit" class="btn">Sign In</button>
+        </div>
+      </form>
+
+      {% if error %}
+      <div class="error-message">{{ error }}</div>
+      {% endif %}
+
+      <div class="back-link">
+        <a href="/">← Back to Home</a>
+      </div>
+    </div>
 
     <script>
       function toggleForm() {
@@ -38,78 +349,5 @@
 
       window.onload = toggleForm;
     </script>
-
-    <form method="POST" action="/login">
-      <!-- Role selection -->
-      <label for="role-customer">
-        <input
-          type="radio"
-          name="role"
-          id="role-customer"
-          value="customer"
-          checked
-          onchange="toggleForm()"
-        />
-        Customer
-      </label>
-      <label for="role-staff">
-        <input
-          type="radio"
-          name="role"
-          id="role-staff"
-          value="staff"
-          onchange="toggleForm()"
-        />
-        Airline Staff
-      </label>
-
-      <br /><br />
-
-      <!-- Customer Login Form -->
-      <div id="customer-login" style="display: block">
-        <label for="customer-email">Email:</label>
-        <input
-          type="text"
-          id="customer-email"
-          name="customer_identifier"
-          required
-        /><br />
-
-        <label for="customer-password">Password:</label>
-        <input
-          type="password"
-          id="customer-password"
-          name="customer_password"
-          required
-        /><br />
-
-        <button type="submit">Login</button>
-      </div>
-
-      <!-- Staff Login Form -->
-      <div id="staff-login" style="display: none">
-        <label for="staff-username">Username:</label>
-        <input
-          type="text"
-          id="staff-username"
-          name="staff_identifier"
-          required
-        /><br />
-
-        <label for="staff-password">Password:</label>
-        <input
-          type="password"
-          id="staff-password"
-          name="staff_password"
-          required
-        /><br />
-
-        <button type="submit">Login</button>
-      </div>
-    </form>
-
-    {% if error %}
-    <p style="color: red; font-weight: bold; margin-top: 1em">{{ error }}</p>
-    {% endif %}
   </body>
 </html>

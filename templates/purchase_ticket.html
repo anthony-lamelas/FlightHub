@@ -2,57 +2,375 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Purchase Ticket</title>
-  </head>
-  <body>
-    <h2>Confirm Ticket Purchase</h2>
-
-    <form method="POST" action="{{ url_for('customer_bp.purchase_ticket') }}">
-      <!-- Hidden fields passed from flight selection -->
-      <input type="hidden" name="flight_number" value="{{ flight_number }}" />
-      <input
-        type="hidden"
-        name="departure_date_time"
-        value="{{ departure_date_time }}"
-      />
-
-      <p><strong>Flight Number:</strong> {{ flight_number }}</p>
-      <p><strong>Departure Date & Time:</strong> {{ departure_date_time }}</p>
-
-      <hr />
-
-      <label for="first_name">First Name:</label><br />
-      <input type="text" name="first_name" required /><br /><br />
-
-      <label for="last_name">Last Name:</label><br />
-      <input type="text" name="last_name" required /><br /><br />
-
-      <label for="date_of_birth">Date of Birth:</label><br />
-      <input type="date" name="date_of_birth" required /><br /><br />
-
-      <label for="card_type">Card Type:</label><br />
-      <select name="card_type" required>
-        <option value="credit">Credit</option>
-        <option value="debit">Debit</option></select
-      ><br /><br />
-
-      <label for="card_number">Card Number:</label><br />
-      <input type="number" name="card_number" required /><br /><br />
-
-      <label for="name_on_card">Name on Card:</label><br />
-      <input type="text" name="name_on_card" required /><br /><br />
-
-      <label for="expiration_date">Expiration Date:</label><br />
-      <input type="month" name="expiration_date" required /><br /><br />
-
-      <button type="submit">Purchase Ticket</button>
-    </form>
-
-    <div class="action-bar">
-      <a href="/customer_home">
-        <button type="button">Back</button>
-      </a>
-    </div>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Purchase Ticket - FlightHub</title>
     
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: linear-gradient(135deg, #f0fff0 0%, #e8f5e8 100%);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #2c3e50;
+        min-height: 100vh;
+        padding: 2rem;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .purchase-container {
+        background: white;
+        border-radius: 12px;
+        padding: 2.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+      }
+
+      .purchase-container:hover {
+        transform: translateY(-2px);
+      }
+
+      .purchase-header {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      .purchase-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.8rem;
+        color: white;
+      }
+
+      .purchase-header h2 {
+        color: #2c3e50;
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .purchase-header p {
+        color: #7f8c8d;
+        font-size: 1rem;
+      }
+
+      /* Flight Info Section */
+      .flight-info {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border-left: 4px solid #3498db;
+      }
+
+      .flight-info h3 {
+        color: #2c3e50;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+        font-weight: 600;
+      }
+
+      .flight-details {
+        display: grid;
+        gap: 0.5rem;
+      }
+
+      .flight-detail {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .flight-detail .label {
+        font-weight: 500;
+        color: #2c3e50;
+      }
+
+      .flight-detail .value {
+        color: #3498db;
+        font-weight: 600;
+      }
+
+      /* Form Sections */
+      .form-section {
+        margin-bottom: 2rem;
+      }
+
+      .form-section h3 {
+        color: #2c3e50;
+        font-size: 1.2rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #ecf0f1;
+      }
+
+      /* Form Grid */
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .form-grid-full {
+        grid-column: 1 / -1;
+      }
+
+      /* Form Groups */
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: 500;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+      }
+
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e8f5e8;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+        font-family: inherit;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: #27ae60;
+        box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+      }
+
+      .form-group select {
+        cursor: pointer;
+      }
+
+      /* Button Styles */
+      .btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        color: white;
+        box-shadow: 0 2px 10px rgba(39, 174, 96, 0.3);
+        width: 100%;
+        margin-top: 1rem;
+        font-size: 1.1rem;
+        padding: 1rem 1.5rem;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(39, 174, 96, 0.4);
+      }
+
+      .btn-secondary {
+        background: #ecf0f1;
+        color: #2c3e50;
+        border: 2px solid #bdc3c7;
+      }
+
+      .btn-secondary:hover {
+        background: #d5dbdb;
+        transform: translateY(-1px);
+      }
+
+      /* Back Link */
+      .back-link {
+        text-align: center;
+        margin-top: 1.5rem;
+      }
+
+      .back-link a {
+        color: #3498db;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+      }
+
+      .back-link a:hover {
+        color: #2980b9;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        body {
+          padding: 1rem;
+        }
+
+        .purchase-container {
+          padding: 2rem;
+        }
+
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .purchase-header h2 {
+          font-size: 1.5rem;
+        }
+
+        .flight-info {
+          padding: 1rem;
+        }
+      }
+
+      /* Security Badge */
+      .security-badge {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        background: #e8f5e8;
+        color: #27ae60;
+        padding: 0.75rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="purchase-container">
+        <div class="purchase-header">
+          <div class="purchase-icon">🎫</div>
+          <h2>Confirm Ticket Purchase</h2>
+          <p>Complete your booking details</p>
+        </div>
+
+        <!-- Flight Information -->
+        <div class="flight-info">
+          <h3>Flight Details</h3>
+          <div class="flight-details">
+            <div class="flight-detail">
+              <span class="label">Flight Number:</span>
+              <span class="value">{{ flight_number }}</span>
+            </div>
+            <div class="flight-detail">
+              <span class="label">Departure Date & Time:</span>
+              <span class="value">{{ departure_date_time }}</span>
+            </div>
+          </div>
+        </div>
+
+        <form method="POST" action="{{ url_for('customer_bp.purchase_ticket') }}">
+          <!-- Hidden fields passed from flight selection -->
+          <input type="hidden" name="flight_number" value="{{ flight_number }}" />
+          <input
+            type="hidden"
+            name="departure_date_time"
+            value="{{ departure_date_time }}"
+          />
+
+          <!-- Personal Information Section -->
+          <div class="form-section">
+            <h3>Personal Information</h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="first_name">First Name</label>
+                <input type="text" name="first_name" id="first_name" required />
+              </div>
+              <div class="form-group">
+                <label for="last_name">Last Name</label>
+                <input type="text" name="last_name" id="last_name" required />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="date_of_birth">Date of Birth</label>
+              <input type="date" name="date_of_birth" id="date_of_birth" required />
+            </div>
+          </div>
+
+          <!-- Payment Information Section -->
+          <div class="form-section">
+            <h3>Payment Information</h3>
+            <div class="form-group">
+              <label for="card_type">Card Type</label>
+              <select name="card_type" id="card_type" required>
+                <option value="">Select card type</option>
+                <option value="credit">Credit Card</option>
+                <option value="debit">Debit Card</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="card_number">Card Number</label>
+              <input 
+                type="number" 
+                name="card_number" 
+                id="card_number" 
+                placeholder="Enter your card number"
+                required 
+              />
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="name_on_card">Name on Card</label>
+                <input 
+                  type="text" 
+                  name="name_on_card" 
+                  id="name_on_card" 
+                  placeholder="Enter name as shown on card"
+                  required 
+                />
+              </div>
+              <div class="form-group">
+                <label for="expiration_date">Expiration Date</label>
+                <input 
+                  type="month" 
+                  name="expiration_date" 
+                  id="expiration_date" 
+                  required 
+                />
+              </div>
+            </div>
+
+            <div class="security-badge">
+              🔒 Your payment information is secure and encrypted
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Purchase Ticket</button>
+        </form>
+
+        <div class="back-link">
+          <a href="/customer_home">← Back to My Flights</a>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
