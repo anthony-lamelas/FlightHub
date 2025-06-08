@@ -1,4 +1,6 @@
 from flask import Blueprint, render_template, session, redirect, request, flash, url_for
+import psycopg2
+import psycopg2.extras
 from db_connection import *
 from datetime import datetime, timedelta
 
@@ -43,7 +45,7 @@ def flight_dashboard():
         return "Unauthorized", 403
 
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     # get filter parameters
     from_date = request.args.get("from_date")
@@ -58,7 +60,7 @@ def flight_dashboard():
     if not any([from_date, to_date, src_code, dest_code]):
         where_clause = (
             "flight.airline_name = %s AND "
-            "flight.departure_date_time BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 30 DAY)"
+            "flight.departure_date_time BETWEEN NOW() AND NOW() + INTERVAL '30 days'"
         )
     else:
         where_parts = ["flight.airline_name = %s"]
@@ -66,14 +68,14 @@ def flight_dashboard():
         # date filters
         if from_date and to_date:
             where_parts.append(
-                "DATE(flight.departure_date_time) BETWEEN %s AND %s"
+                "flight.departure_date_time::date BETWEEN %s AND %s"
             )
             parameters.extend([from_date, to_date])
         elif from_date:
-            where_parts.append("DATE(flight.departure_date_time) >= %s")
+            where_parts.append("flight.departure_date_time::date >= %s")
             parameters.append(from_date)
         elif to_date:
-            where_parts.append("DATE(flight.departure_date_time) <= %s")
+            where_parts.append("flight.departure_date_time::date <= %s")
             parameters.append(to_date)
         # if neither from_date nor to_date, do not add any date filter here
 
@@ -176,7 +178,7 @@ def create_flight():
             conn.commit()
             return redirect("/staff/home")
 
-        except mysql.connector.errors.IntegrityError:
+        except psycopg2.IntegrityError:
             conn.rollback()
             flash("Flight already exists or is invalid.")
             return redirect("/staff/create")
@@ -198,7 +200,7 @@ def change_flight_status():
 
     # 1. Open connection and cursor
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     airline_name = get_staff_airline()
 
@@ -277,7 +279,7 @@ def add_airplane():
             flash("Airplane added successfully.", "success")
             return redirect(url_for('airline_staff_bp.flight_dashboard'))
 
-        except mysql.connector.errors.IntegrityError:
+        except psycopg2.IntegrityError:
             conn.rollback()
             flash("Airplane already exists or is invalid.", "error")
             return redirect("/staff/add-plane")
@@ -324,7 +326,7 @@ def add_airport():
             flash("Airport added successfully.", "success")
             return redirect(url_for('airline_staff_bp.flight_dashboard'))
 
-        except mysql.connector.errors.IntegrityError:
+        except psycopg2.IntegrityError:
             conn.rollback()
             flash("Airport already exists or input is invalid.", "error")
             return redirect("/staff/add-airport")
@@ -353,13 +355,13 @@ def view_ratings():
     ratings_data = []
 
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     try:
         query = """
                 SELECT f.flight_number,
                     AVG(r.rating) AS avg_rating,
-                    GROUP_CONCAT(r.comments SEPARATOR ' || ') AS comments
+                    STRING_AGG(r.comments, ' || ') AS comments
                 FROM review r
                 JOIN ticket t ON r.ticket_id = t.ticket_id
                 JOIN flight f ON t.airline_name = f.airline_name
@@ -397,23 +399,23 @@ def view_reports():
         to_date = today.strftime('%Y-%m-%d')
 
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     try:
         query = """
-                SELECT YEAR(p.purchase_date_time) AS year,
-                    MONTH(p.purchase_date_time) AS month,
+                            SELECT EXTRACT(YEAR FROM p.purchase_date_time) AS year,
+                   EXTRACT(MONTH FROM p.purchase_date_time) AS month,
                     COUNT(*) AS tickets_sold
                     FROM ticket t JOIN purchase p ON t.ticket_id = p.ticket_id
                     WHERE t.airline_name = %s
                     AND p.purchase_date_time BETWEEN %s AND %s
-                    GROUP BY YEAR(p.purchase_date_time), MONTH(p.purchase_date_time)
+                    GROUP BY EXTRACT(YEAR FROM p.purchase_date_time), EXTRACT(MONTH FROM p.purchase_date_time)
                     ORDER BY year, month
                 """
         cursor.execute(query,(airline_name,from_date,to_date))
         report_data = cursor.fetchall()
         for row in report_data:
-            month_number = row['month']
+            month_number = int(row['month'])  # Convert Decimal to int
             month_name = datetime(1900, month_number, 1).strftime('%B')  # January, February, etc.
             row['month_name'] = month_name
         

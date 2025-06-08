@@ -1,4 +1,6 @@
 from flask import Blueprint, render_template, request
+import psycopg2
+import psycopg2.extras
 from db_connection import *
 from datetime import datetime
 
@@ -19,7 +21,7 @@ def search_flights():
             return_date = datetime.strptime(return_date, "%Y-%m-%d").strftime("%Y-%m-%d")
 
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
         # Query for departing flights
         query = """

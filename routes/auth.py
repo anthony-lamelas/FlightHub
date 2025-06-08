@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, session
 import hashlib 
-import mysql.connector
+import psycopg2
 from db_connection import *
-from mysql.connector.errors import IntegrityError
+from psycopg2 import IntegrityError
 
 
 auth_bp = Blueprint("auth", __name__)
@@ -47,7 +47,10 @@ def register():
                 passport_expiration = request.form.get("passport_expiration")
                 date_of_birth = request.form.get("date_of_birth")
                 email = request.form.get("email")
-                password = hashlib.md5(request.form.get("password").encode()).hexdigest()
+                password_raw = request.form.get("password")
+                if not password_raw:
+                    return render_template("register.html", error="Password is required.", selected_role=role)
+                password = hashlib.md5(password_raw.encode()).hexdigest()
 
                 cursor.execute("""
                     INSERT INTO customers (
@@ -70,7 +73,19 @@ def register():
                 first_name = request.form.get("first_name")
                 last_name = request.form.get("last_name")
                 date_of_birth = request.form.get("date_of_birth")
-                password = hashlib.md5(request.form.get("password").encode()).hexdigest()
+                password_raw = request.form.get("password")
+                
+                # Validate required fields
+                if not all([username, airline_name, first_name, last_name, date_of_birth, password_raw]):
+                    return render_template("register.html", error="All fields are required for staff registration.", selected_role=role)
+                
+                # password_raw is guaranteed to be non-None after the validation above
+                password = hashlib.md5(password_raw.encode()).hexdigest()
+
+                # Check if airline exists
+                cursor.execute("SELECT airline_name FROM airline WHERE airline_name = %s", (airline_name,))
+                if not cursor.fetchone():
+                    return render_template("register.html", error=f"Airline '{airline_name}' does not exist. Please contact your administrator.", selected_role=role)
 
                 cursor.execute("""
                     INSERT INTO airline_staff (
@@ -103,9 +118,20 @@ def register():
         
     except IntegrityError as e:
         conn.rollback()
-        if "Duplicate entry" in str(e):
-            return render_template("register.html", error="User already exists. Please try again.", selected_role=role)
-    return render_template("register.html", error="Registration failed. Please check your input.", selected_role=role)
+        error_msg = str(e).lower()
+        if "duplicate" in error_msg or "unique" in error_msg:
+            if role == "staff":
+                return render_template("register.html", error="Username already exists. Please choose a different username.", selected_role=role)
+            else:
+                return render_template("register.html", error="Email already exists. Please use a different email.", selected_role=role)
+        elif "foreign key" in error_msg:
+            return render_template("register.html", error="Invalid airline name. Please contact your administrator.", selected_role=role)
+        else:
+            return render_template("register.html", error=f"Database error: {str(e)}", selected_role=role)
+    except Exception as e:
+        conn.rollback()
+        print(f"Registration error: {e}")  # Log the error for debugging
+        return render_template("register.html", error="Registration failed. Please check your input and try again.", selected_role=role)
 @auth_bp.route("/login", methods=["POST"])
 def login():
     role = request.form.get("role", "").lower()
@@ -133,7 +159,7 @@ def login():
 
     try:
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         cursor.execute(query, (identifier, hashed_pw))
         user = cursor.fetchone()
         cursor.close()
@@ -150,6 +176,6 @@ def login():
         else:
             return render_template(template, error="Invalid credentials. Please try again.", selected_role=role)
 
-    except mysql.connector.Error as e:
+    except psycopg2.Error as e:
         print(f"Database error: {e}")
         return render_template(template, error="An error occurred. Try again later.", selected_role=role)

@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, session, redirect, request, flash, url_for
-import mysql.connector
+import psycopg2
+import psycopg2.extras
 from db_connection import *
 from datetime import datetime, timedelta
 from decimal import Decimal
@@ -14,7 +15,7 @@ def customer_home():
 
     user_email = session.get("user_id")
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     # Handle flight filtering (optional)
     query = """
@@ -36,10 +37,10 @@ def customer_home():
         dest_code = request.form.get("dest_code")
 
         if from_date:
-            filters.append("DATE(f.departure_date_time) >= %s")
+            filters.append("f.departure_date_time::date >= %s")
             values.append(from_date)
         if to_date:
-            filters.append("DATE(f.departure_date_time) <= %s")
+            filters.append("f.departure_date_time::date <= %s")
             values.append(to_date)
         if src_code:
             filters.append("f.departure_airport_code = %s")
@@ -217,7 +218,7 @@ def cancel_ticket():
     ticket_id = request.form.get("ticket_id")
 
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     # Step 1: Get flight departure time for the ticket
     cursor.execute("""
