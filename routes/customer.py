@@ -123,7 +123,7 @@ def purchase_ticket():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Step 1: Get airplane_id and capacity for the flight
+    # Get airplane_id and capacity for the flight
     cursor.execute("""
         SELECT f.airline_name, f.airplane_id, f.base_price, a.number_of_seats
         FROM Flight f
@@ -138,7 +138,7 @@ def purchase_ticket():
 
     airline_name, airplane_id, base_price, total_seats = flight_data
 
-    # Step 2: Count how many seats are booked (is_purchased = TRUE)
+    # Count how many seats are booked (is_purchased = TRUE)
     cursor.execute("""
         SELECT COUNT(*) FROM Ticket
         WHERE flight_number = %s AND departure_date_time = %s AND airline_name = %s AND is_purchased = TRUE
@@ -149,7 +149,7 @@ def purchase_ticket():
         flash("This flight is fully booked.")
         return redirect("/customer_home")
 
-    # Step 3: Find an available ticket (not purchased)
+    # Find an available ticket (not purchased)
     cursor.execute("""
         SELECT ticket_id, sold_price FROM Ticket
         WHERE flight_number = %s AND departure_date_time = %s AND airline_name = %s AND is_purchased = FALSE
@@ -163,20 +163,20 @@ def purchase_ticket():
 
     ticket_id, sold_price = ticket
 
-    # Step 4: Update price if demand > 60%
+    # Update price if demand > 60%
     if booked_seats >= 0.6 * total_seats:
         sold_price = round(base_price * Decimal(1.2), 2)
     else:
         sold_price = base_price
 
-    # Step 5: Update ticket as purchased and price
+    # Update ticket as purchased and price
     cursor.execute("""
         UPDATE Ticket
         SET is_purchased = TRUE, sold_price = %s
         WHERE ticket_id = %s
     """, (sold_price, ticket_id))
 
-    # Step 6: Insert into Purchase table
+    # Insert into Purchase table
     cursor.execute("""
         INSERT INTO Purchase (
             email, ticket_id, first_name, last_name, date_of_birth,
@@ -220,7 +220,7 @@ def cancel_ticket():
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-    # Step 1: Get flight departure time for the ticket
+    # Get flight departure time for the ticket
     cursor.execute("""
         SELECT f.departure_date_time
         FROM Purchase p
@@ -242,11 +242,11 @@ def cancel_ticket():
     departure_time = result["departure_date_time"]
     curr_time_plus_24 = datetime.now() + timedelta(hours=24)
 
-    # Step 2: Check if cancellation is allowed
+    # Check if cancellation is allowed
     if departure_time <= curr_time_plus_24:
         flash("You can only cancel tickets for flights more than 24 hours in the future.")
     else:
-        # Step 3: Cancel the ticket (mark Ticket as not purchased, delete from Purchase)
+        # Cancel the ticket (mark Ticket as not purchased, delete from Purchase)
         cursor.execute("""
             UPDATE Ticket
             SET is_purchased = FALSE

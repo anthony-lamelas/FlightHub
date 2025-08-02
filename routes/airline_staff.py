@@ -251,7 +251,6 @@ def change_flight_status():
         'change_flight_status.html',
         flights=flights
     )
-#-------------------airline works -----------------------------
 
 @airline_staff_bp.route('/add-plane', methods=['GET', 'POST'])
 def add_airplane():
@@ -294,10 +293,6 @@ def add_airplane():
             conn.close()
 
     return render_template('add_airplane.html')
-
-
-
-#----------------------------------------------#
 
 # Add Airport
 @airline_staff_bp.route('/add-airport', methods=['GET', 'POST'])
@@ -342,9 +337,6 @@ def add_airport():
 
     return render_template('add_airport.html')
 
-
-
-
 # View flight ratings
 @airline_staff_bp.route('/flight-ratings', methods=['GET', 'POST'])
 def view_ratings():
@@ -379,10 +371,6 @@ def view_ratings():
 
     return render_template('view_ratings.html', ratings=ratings_data)
 
-
-# View reports (tickets sold in bar chart / table)
-# 7. View reports: Total amounts of ticket sold based on range of dates/last year/last month etc. Month
-# wise tickets sold in a bar chart/table
 @airline_staff_bp.route('/view-reports', methods=['GET','POST'])
 def view_reports():
     if "user_id" not in session or session.get("user_type") != "staff":

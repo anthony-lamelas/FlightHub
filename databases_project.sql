@@ -1,13 +1,4 @@
--- PostgreSQL Database Dump
--- Converted from MySQL for Supabase compatibility
--- Database: databases_project
-
--- Remove MySQL-specific settings and use PostgreSQL equivalents
 BEGIN;
-
---
--- Table structure for table airline
---
 
 DROP TABLE IF EXISTS airline CASCADE;
 CREATE TABLE airline (
@@ -15,18 +6,9 @@ CREATE TABLE airline (
   PRIMARY KEY (airline_name)
 );
 
---
--- Dumping data for table airline
---
-
 INSERT INTO airline (airline_name) VALUES
 ('JetBlue');
 
--- --------------------------------------------------------
-
---
--- Table structure for table airline_staff
---
 
 DROP TABLE IF EXISTS airline_staff CASCADE;
 CREATE TABLE airline_staff (
@@ -41,18 +23,10 @@ CREATE TABLE airline_staff (
   FOREIGN KEY (airline_name) REFERENCES airline(airline_name)
 );
 
---
--- Dumping data for table airline_staff
---
 
 INSERT INTO airline_staff (username, airline_name, password, first_name, last_name, date_of_birth) VALUES
 ('admin', 'JetBlue', 'e2fc714c4727ee9395f324cd2e7f331f', 'Roe', 'Jones', '1978-05-25');
 
--- --------------------------------------------------------
-
---
--- Table structure for table airplane
---
 
 DROP TABLE IF EXISTS airplane CASCADE;
 CREATE TABLE airplane (
@@ -64,10 +38,6 @@ CREATE TABLE airplane (
   FOREIGN KEY (airline_name) REFERENCES airline(airline_name)
 );
 
---
--- Dumping data for table airplane
---
-
 INSERT INTO airplane (airplane_id, airline_name, number_of_seats, manufacturing_company) VALUES
 ('B2374', 'JetBlue', 50, 'Boeing'),
 ('10', 'JetBlue', 4, 'Boeing'),
@@ -75,11 +45,6 @@ INSERT INTO airplane (airplane_id, airline_name, number_of_seats, manufacturing_
 ('2', 'JetBlue', 4, 'Airbus'),
 ('1', 'JetBlue', 4, 'Boeing');
 
--- --------------------------------------------------------
-
---
--- Table structure for table airport
---
 
 DROP TABLE IF EXISTS airport CASCADE;
 CREATE TABLE airport (
@@ -89,10 +54,6 @@ CREATE TABLE airport (
   country VARCHAR(100) DEFAULT NULL,
   PRIMARY KEY (airport_code)
 );
-
---
--- Dumping data for table airport
---
 
 INSERT INTO airport (airport_code, airport_name, city, country) VALUES
 ('HKA', 'HKA', 'Hong Kong', 'China'),
@@ -105,12 +66,6 @@ INSERT INTO airport (airport_code, airport_name, city, country) VALUES
 ('SHEN', 'SHEN', 'Shenzhen', 'China'),
 ('CDG', 'CDG', 'Paris', 'France'),
 ('EWK', 'Newark Airport', 'New York', 'NJ');
-
--- --------------------------------------------------------
-
---
--- Table structure for table customers
---
 
 DROP TABLE IF EXISTS customers CASCADE;
 CREATE TABLE customers (
@@ -130,21 +85,12 @@ CREATE TABLE customers (
   PRIMARY KEY (email)
 );
 
---
--- Dumping data for table customers
---
 
 INSERT INTO customers (email, first_name, last_name, password, building_number, street, city, state, phone_number, passport_number, passport_country, passport_expiration, date_of_birth) VALUES
 ('user3@nyu.edu', 'User', '3', '81dc9bdb52d04dc20036dbd8313ed055', 1890, 'Jay St', 'Brookly', 'New York', '12343244324', '54324', 'USA', '2025-09-24', '1999-09-19'),
 ('user2@nyu.edu', 'User', '2', '81dc9bdb52d04dc20036dbd8313ed055', 1890, 'Jay St', 'Brooklyn', 'New York', '12343234323', '54323', 'USA', '2025-10-24', '1999-10-19'),
 ('user1@nyu.edu', 'User', '1', '81dc9bdb52d04dc20036dbd8313ed055', 5405, 'Jay St', 'Brooklyn', 'New York', '12343224322', '54322', 'USA', '2025-12-25', '1999-11-19'),
 ('testcustomer@nyu.edu', 'Test ', 'Customer 1', '81dc9bdb52d04dc20036dbd8313ed055', 1555, 'Jay St', 'Brooklyn', 'New York', '12343214321', '54321', 'USA', '2025-12-24', '1999-12-19');
-
--- --------------------------------------------------------
-
---
--- Table structure for table flight
---
 
 DROP TABLE IF EXISTS flight CASCADE;
 CREATE TABLE flight (
@@ -165,9 +111,6 @@ CREATE TABLE flight (
   FOREIGN KEY (airport_code) REFERENCES airport(airport_code)
 );
 
---
--- Dumping data for table flight
---
 
 INSERT INTO flight (airline_name, airplane_id, flight_number, airport_code, departure_date_time, arrival_date_time, base_price, airplane_number, flight_status, arrival_airport_code, departure_airport_code) VALUES
 ('JetBlue', 'B2374', '889', 'JFK', '2025-06-13 21:56:00', '2025-06-28 21:56:00', 343343.00, '446', 'On Time', 'JFK', 'MIA'),
@@ -183,11 +126,6 @@ INSERT INTO flight (airline_name, airplane_id, flight_number, airport_code, depa
 ('JetBlue', '3', '104', 'PVG', '2025-03-07 13:25:25', '2025-03-07 16:50:25', 300.00, NULL, 'on-time', 'BEI', 'PVG'),
 ('JetBlue', '3', '102', 'SFO', '2025-02-12 13:25:25', '2025-02-12 16:50:25', 300.00, NULL, 'on-time', 'LAX', 'SFO');
 
--- --------------------------------------------------------
-
---
--- Table structure for table ticket
---
 
 DROP TABLE IF EXISTS ticket CASCADE;
 CREATE TABLE ticket (
@@ -201,9 +139,6 @@ CREATE TABLE ticket (
   FOREIGN KEY (flight_number, departure_date_time) REFERENCES flight(flight_number, departure_date_time)
 );
 
---
--- Dumping data for table ticket
---
 
 INSERT INTO ticket (ticket_id, airline_name, flight_number, departure_date_time, sold_price, is_purchased) VALUES
 ('274', 'JetBlue', '206', '2025-07-01 13:25:25', 480.00, TRUE),
@@ -233,11 +168,6 @@ INSERT INTO ticket (ticket_id, airline_name, flight_number, departure_date_time,
 ('2', 'JetBlue', '102', '2025-02-12 13:25:25', 300.00, TRUE),
 ('1', 'JetBlue', '102', '2025-02-12 13:25:25', 300.00, TRUE);
 
--- --------------------------------------------------------
-
---
--- Table structure for table purchase
---
 
 DROP TABLE IF EXISTS purchase CASCADE;
 CREATE TABLE purchase (
@@ -256,9 +186,6 @@ CREATE TABLE purchase (
   FOREIGN KEY (ticket_id) REFERENCES ticket(ticket_id)
 );
 
---
--- Dumping data for table purchase
---
 
 INSERT INTO purchase (email, ticket_id, first_name, last_name, date_of_birth, card_type, card_number, name_on_card, expiration_date, purchase_date_time) VALUES
 ('user3@nyu.edu', '14', 'User', '3', '1999-09-19', 'credit', '1111222233335555', 'User 3', '2024-03-20', '2025-04-20 11:55:55'),
@@ -281,11 +208,6 @@ INSERT INTO purchase (email, ticket_id, first_name, last_name, date_of_birth, ca
 ('testcustomer@nyu.edu', '20', 'Test', 'Customer1', '1999-12-19', 'credit', '1111222233334444', 'Test Customer 1', '2024-03-16', '2024-12-16 11:55:55'),
 ('testcustomer@nyu.edu', '274', 'Test', 'Customer', '2025-04-30', 'credit', '1234567890', 'TEst customer', '2025-12-01', '2025-05-06 19:29:30');
 
--- --------------------------------------------------------
-
---
--- Table structure for table review
---
 
 DROP TABLE IF EXISTS review CASCADE;
 CREATE TABLE review (
@@ -298,10 +220,6 @@ CREATE TABLE review (
   FOREIGN KEY (ticket_id) REFERENCES ticket(ticket_id)
 );
 
---
--- Dumping data for table review
---
-
 INSERT INTO review (email, ticket_id, comments, rating) VALUES
 ('testcustomer@nyu.edu', '5', 'Customer Care services are not good', 1),
 ('user2@nyu.edu', '3', 'Satisfied and will use the same flight again', 3),
@@ -311,12 +229,6 @@ INSERT INTO review (email, ticket_id, comments, rating) VALUES
 ('testcustomer@nyu.edu', '12', 'Good', 5),
 ('testcustomer@nyu.edu', '20', 'Great flight', 5);
 
--- --------------------------------------------------------
-
---
--- Table structure for table staff_email
---
-
 DROP TABLE IF EXISTS staff_email CASCADE;
 CREATE TABLE staff_email (
   username VARCHAR(100) NOT NULL,
@@ -325,18 +237,8 @@ CREATE TABLE staff_email (
   FOREIGN KEY (username) REFERENCES airline_staff(username)
 );
 
---
--- Dumping data for table staff_email
---
-
 INSERT INTO staff_email (username, email) VALUES
 ('admin', 'staff@nyu.edu');
-
--- --------------------------------------------------------
-
---
--- Table structure for table staff_phone
---
 
 DROP TABLE IF EXISTS staff_phone CASCADE;
 CREATE TABLE staff_phone (
@@ -345,10 +247,6 @@ CREATE TABLE staff_phone (
   PRIMARY KEY (username, phone_number),
   FOREIGN KEY (username) REFERENCES airline_staff(username)
 );
-
---
--- Dumping data for table staff_phone
---
 
 INSERT INTO staff_phone (username, phone_number) VALUES
 ('admin', '11122223333'),

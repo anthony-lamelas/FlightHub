@@ -28,7 +28,7 @@ def logout():
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
     try:        
-        if request.method == "POST":  # checks if form has been submitted
+        if request.method == "POST": 
             role = request.form.get("role")
 
             conn = get_db_connection()
@@ -79,7 +79,6 @@ def register():
                 if not all([username, airline_name, first_name, last_name, date_of_birth, password_raw]):
                     return render_template("register.html", error="All fields are required for staff registration.", selected_role=role)
                 
-                # password_raw is guaranteed to be non-None after the validation above
                 password = hashlib.md5(password_raw.encode()).hexdigest()
 
                 # Check if airline exists
